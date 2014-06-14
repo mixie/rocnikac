@@ -12,7 +12,7 @@ $(document).ready(function(){
 			var obsah = reader.result;
 			obsah=NUM_DS+","+FUN_DS+","+VAL_DS+"\n"+obsah;
 			var val=d3.csv.parse(obsah);
-			console.log(val);
+			//console.log(val);
 			preprocess(val);
 		}
 		if(file!="undefined"){

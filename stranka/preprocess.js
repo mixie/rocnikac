@@ -1,10 +1,9 @@
-
 function preprocess(val){
-	var pov=[];
-	var initial=[];
+	var pov=[]; //pocet uvodnych prvkov
+	var initial=[]; 
 	var good = ["operator[]"];
 	var others = ["insert","push_back"];
-	var ds=[];
+	var ds=[]; //new riadky
 
 	for(v in val){
 		if(val[v].funDS=="new"){
@@ -20,9 +19,9 @@ function preprocess(val){
 		}
 	}
 	console.log(pov);
+	console.log(ds);
+	console.log(val);
 	zobrazform(ds,pov,val);
-	var temp=[];
-	console.log(temp);
 }
 
 function zobrazform(ds,pov,val){
