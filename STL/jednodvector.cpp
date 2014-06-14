@@ -1,33 +1,24 @@
 #include <vector>
 #include <cstdio>
-/**#include <set>
-#include <deque>**/
-
-
 #include <iostream>
-
-//#include "string"
+#include <set>
+#include <deque>
 
 using namespace std;
 
 int main(){
 	vector<long long int> a;
 	vector<int> b;
-	//string be("sa");
-//	deque <int> dd;
-	//string h("Initial string");
-	//string hh();
-	//string a;
-	//string b="aaaa";
-//	set<string> e;
- //	e.insert("haha");
+	deque <int> dd;
+	set<string> e;
+	e.insert("haha");
 	vector<int> c(3,50);
 	vector<int> d(30);
-/**	dd.push_front(5);
+	dd.push_front(5);
 	dd.push_back(3);
 	dd[1]=2;
 	dd.pop_front();
-	dd.pop_front(); **/
+	dd.pop_front(); 
 	for(int i=0;i<20;i++){
 		printf("%d",d[i]);
 	}

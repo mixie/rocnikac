@@ -127,20 +127,20 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       { return allocator_type(_M_get_Tp_allocator()); }
 
       _Vector_base()
-      : _M_impl() { cerr<< c.getNumber()<<",new,vector"<< "\n"; }
+      : _M_impl() { cerr<<"new,"<<c.getNumber()<<",vector"<< "\n"; }
 
       _Vector_base(const allocator_type& __a)
-      : _M_impl(__a) {cerr<< c.getNumber()<<",new,vector"<< "\n"; }
+      : _M_impl(__a) {cerr<<"new,"<<c.getNumber()<<",vector"<< "\n"; }
 
       _Vector_base(size_t __n)
       : _M_impl()
       { _M_create_storage(__n);  
-      cerr<< c.getNumber()<<",new,vector"<< "\n"; }
+      cerr<<"new,"<<c.getNumber()<<",vector"<< "\n";}
 
       _Vector_base(size_t __n, const allocator_type& __a)
       : _M_impl(__a)
       { _M_create_storage(__n); 
-      cerr<< c.getNumber()<<",new,vector"<< "\n"; }
+      cerr<<"new,"<<c.getNumber()<<",vector"<< "\n"; }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
       _Vector_base(_Tp_alloc_type&& __a)
@@ -754,7 +754,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       reference
       operator[](size_type __n)
-      { cerr <<this->c.getNumber() <<",operator[],"<<__n<<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n<<","<<*(this->_M_impl._M_start + __n)<<"\n";
         return *(this->_M_impl._M_start + __n); }
 
       /**
@@ -770,7 +770,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       const_reference
       operator[](size_type __n) const
-      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<" "<<*(this->_M_impl._M_start + __n) <<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<","<<*(this->_M_impl._M_start + __n) <<"\n";
         return *(this->_M_impl._M_start + __n); }
 
     protected:

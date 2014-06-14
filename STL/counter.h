@@ -2,7 +2,6 @@
 #define COUNTER_H
 
 #include <iostream>
-#include <cstdio>
 
 class Counter
 {

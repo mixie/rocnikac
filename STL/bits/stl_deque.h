@@ -453,28 +453,28 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
 
       _Deque_base()
       : _M_impl()
-      { cerr << c.getNumber() <<" new deque\n";
+      { cerr <<"new,"<< c.getNumber() <<",deque\n";
        _M_initialize_map(0);
          }
 
       _Deque_base(size_t __num_elements)
       : _M_impl()
-      { cerr << c.getNumber() <<" new deque\n";
+      { cerr <<"new,"<< c.getNumber() <<",deque\n";
         _M_initialize_map(__num_elements); }
 
       _Deque_base(const allocator_type& __a, size_t __num_elements)
       : _M_impl(__a)
-      { cerr << c.getNumber() <<" new deque\n";
+      { cerr <<"new,"<< c.getNumber() <<",deque\n";
         _M_initialize_map(__num_elements); }
 
       _Deque_base(const allocator_type& __a)
       : _M_impl(__a)
-      { cerr << c.getNumber() <<" new deque\n"; }
+      { cerr <<"new,"<< c.getNumber() <<",deque\n"; }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
       _Deque_base(_Deque_base&& __x)
       : _M_impl(std::move(__x._M_get_Tp_allocator()))
-      { cerr << c.getNumber() <<" new deque\n";
+      { cerr <<"new,"<< c.getNumber() <<",deque\n";
 	_M_initialize_map(0);
 	if (__x._M_impl._M_map)
 	  {
@@ -1229,7 +1229,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       reference
       operator[](size_type __n)
-      { cerr <<this->c.getNumber() <<" operator[] "<< __n <<" "<<this->_M_impl._M_start[difference_type(__n)]<<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<","<<this->_M_impl._M_start[difference_type(__n)]<<"\n";
         return this->_M_impl._M_start[difference_type(__n)]; }
 
       /**
@@ -1245,7 +1245,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       const_reference
       operator[](size_type __n) const
-      { cerr <<this->c.getNumber() <<" operator[] "<< __n <<" "<<this->_M_impl._M_start[difference_type(__n)]<<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<","<<this->_M_impl._M_start[difference_type(__n)]<<"\n";
         return this->_M_impl._M_start[difference_type(__n)]; }
 
     protected:
@@ -1300,7 +1300,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       reference
       front()
-      { cerr <<this->c.getNumber() <<" front "<<*begin()<<"\n";
+      { cerr <<this->c.getNumber() <<",front,"<<*begin()<<"\n";
         return *begin(); }
 
       /**
@@ -1309,7 +1309,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       const_reference
       front() const
-      { cerr <<this->c.getNumber() <<" front "<<*begin()<<"\n";
+      { cerr <<this->c.getNumber() <<",front,"<<*begin()<<"\n";
         return *begin(); }
 
       /**
@@ -1320,7 +1320,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       back()
       { iterator __tmp = end();
 	--__tmp;
-  cerr <<this->c.getNumber() <<" back "<<*__tmp<<"\n";
+  cerr <<this->c.getNumber() <<",back,"<<*__tmp<<"\n";
 	return *__tmp;
       }
 
@@ -1333,7 +1333,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       {
 	const_iterator __tmp = end();
 	--__tmp;
-  cerr <<this->c.getNumber() <<" back "<<*__tmp<<"\n";
+  cerr <<this->c.getNumber() <<",back,"<<*__tmp<<"\n";
 	return *__tmp;
       }
 
@@ -1350,7 +1350,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       void
       push_front(const value_type& __x)
       {
-      cerr <<this->c.getNumber() <<" push_front "<<__x<<"\n";
+      cerr <<this->c.getNumber() <<",push_front,"<<__x<<"\n";
 	if (this->_M_impl._M_start._M_cur != this->_M_impl._M_start._M_first)
 	  {
 	    this->_M_impl.construct(this->_M_impl._M_start._M_cur - 1, __x);
@@ -1363,7 +1363,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
       void
       push_front(value_type&& __x)
-      { cerr <<this->c.getNumber() <<" push_front "<<__x<<"\n";
+      { cerr <<this->c.getNumber() <<",push_front,"<<__x<<"\n";
         emplace_front(std::move(__x)); }
 
       template<typename... _Args>
@@ -1382,7 +1382,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       void
       push_back(const value_type& __x)
-      { cerr <<this->c.getNumber() <<" push_back "<<__x<<"\n";
+      { cerr <<this->c.getNumber() <<",push_back,"<<__x<<"\n";
 	if (this->_M_impl._M_finish._M_cur
 	    != this->_M_impl._M_finish._M_last - 1)
 	  {
@@ -1396,7 +1396,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
       void
       push_back(value_type&& __x)
-      { cerr <<this->c.getNumber() <<" push_back "<< __x <<"\n";
+      { cerr <<this->c.getNumber() <<",push_back,"<< __x <<"\n";
         emplace_back(std::move(__x)); }
 
       template<typename... _Args>
@@ -1418,7 +1418,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
 	if (this->_M_impl._M_start._M_cur
 	    != this->_M_impl._M_start._M_last - 1)
 	  {
-      cerr <<this->c.getNumber() <<" pop_front "<<"\n";
+      cerr <<this->c.getNumber() <<",pop_front"<<"\n";
 	    this->_M_impl.destroy(this->_M_impl._M_start._M_cur);
 	    ++this->_M_impl._M_start._M_cur;
 	  }
@@ -1442,7 +1442,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
 	  {
 	    --this->_M_impl._M_finish._M_cur;
 	    this->_M_impl.destroy(this->_M_impl._M_finish._M_cur);
-      cerr <<this->c.getNumber() <<" pop_back "<<"\n";
+      cerr <<this->c.getNumber() <<",pop_back"<<"\n";
 	  }
 	else
 	  _M_pop_back_aux();
