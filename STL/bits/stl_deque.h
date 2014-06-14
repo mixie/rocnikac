@@ -453,28 +453,30 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
 
       _Deque_base()
       : _M_impl()
-      { cerr <<"new,"<< c.getNumber() <<",deque\n";
+      { cerr <<c.getNumber() <<",new"<<",deque\n";
        _M_initialize_map(0);
          }
 
       _Deque_base(size_t __num_elements)
       : _M_impl()
-      { cerr <<"new,"<< c.getNumber() <<",deque\n";
+      { cerr <<c.getNumber() <<",new"<<",deque\n";
+       cerr <<this->c.getNumber()<<",resize,"<<__num_elements<<"\n";
         _M_initialize_map(__num_elements); }
 
       _Deque_base(const allocator_type& __a, size_t __num_elements)
       : _M_impl(__a)
-      { cerr <<"new,"<< c.getNumber() <<",deque\n";
+      { cerr <<c.getNumber() <<",new"<<",deque\n";
+       cerr <<this->c.getNumber()<<",resize,"<<__num_elements<<"\n";
         _M_initialize_map(__num_elements); }
 
       _Deque_base(const allocator_type& __a)
       : _M_impl(__a)
-      { cerr <<"new,"<< c.getNumber() <<",deque\n"; }
+      { cerr <<c.getNumber() <<",new"<<",deque\n"; }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
       _Deque_base(_Deque_base&& __x)
       : _M_impl(std::move(__x._M_get_Tp_allocator()))
-      { cerr <<"new,"<< c.getNumber() <<",deque\n";
+      { cerr <<c.getNumber() <<",new"<<",deque\n";
 	_M_initialize_map(0);
 	if (__x._M_impl._M_map)
 	  {
@@ -1147,6 +1149,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       void
       resize(size_type __new_size)
       {
+        cerr <<this->c.getNumber()<<",resize,"<<__new_size<<"\n";
 	const size_type __len = size();
 	if (__new_size > __len)
 	  _M_default_append(__new_size - __len);
@@ -1169,6 +1172,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       void
       resize(size_type __new_size, const value_type& __x)
       {
+        cerr <<this->c.getNumber()<<",resize,"<<__new_size<<"\n";
 	const size_type __len = size();
 	if (__new_size > __len)
 	  insert(this->_M_impl._M_finish, __new_size - __len, __x);
@@ -1191,6 +1195,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       void
       resize(size_type __new_size, value_type __x = value_type())
       {
+        cerr <<this->c.getNumber()<<",resize,"<<__new_size<<"\n";
 	const size_type __len = size();
 	if (__new_size > __len)
 	  insert(this->_M_impl._M_finish, __new_size - __len, __x);
@@ -1229,7 +1234,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       reference
       operator[](size_type __n)
-      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<","<<this->_M_impl._M_start[difference_type(__n)]<<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<"\n";
         return this->_M_impl._M_start[difference_type(__n)]; }
 
       /**
@@ -1245,7 +1250,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       const_reference
       operator[](size_type __n) const
-      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<","<<this->_M_impl._M_start[difference_type(__n)]<<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<"\n";
         return this->_M_impl._M_start[difference_type(__n)]; }
 
     protected:

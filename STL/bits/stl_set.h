@@ -141,7 +141,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        *  @brief  Default constructor creates no elements.
        */
       set()
-      : _M_t() { cerr<<"new,"<<c.getNumber()<<",set"<< "\n";}
+      : _M_t() { cerr <<c.getNumber() <<",new"<<",set\n";}
 
       /**
        *  @brief  Creates a %set with no elements.
@@ -151,7 +151,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       explicit
       set(const _Compare& __comp,
 	  const allocator_type& __a = allocator_type())
-      : _M_t(__comp, _Key_alloc_type(__a)) {  cerr<<"new,"<<c.getNumber()<<",set"<< "\n";}
+      : _M_t(__comp, _Key_alloc_type(__a)) {  cerr <<c.getNumber() <<",new"<<",set\n";}
 
       /**
        *  @brief  Builds a %set from a range.
@@ -166,7 +166,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       template<typename _InputIterator>
 	set(_InputIterator __first, _InputIterator __last)
 	: _M_t()
-	{  cerr<<"new,"<<c.getNumber()<<",set"<< "\n";
+	{  cerr <<c.getNumber() <<",new"<<",set\n";
             _M_t._M_insert_unique(__first, __last); }
 
       /**
@@ -186,7 +186,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
 	    const _Compare& __comp,
 	    const allocator_type& __a = allocator_type())
 	: _M_t(__comp, _Key_alloc_type(__a))
-        { cerr<<"new,"<<c.getNumber()<<",set"<< "\n";
+        { cerr <<c.getNumber() <<",new"<<",set\n";
             _M_t._M_insert_unique(__first, __last); }
 
       /**
@@ -197,7 +197,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        *  by @a __x.
        */
       set(const set& __x)
-      : _M_t(__x._M_t) {  cerr<<"new,"<<c.getNumber()<<",set"<< "\n";}
+      : _M_t(__x._M_t) {  cerr <<c.getNumber() <<",new"<<",set\n";}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
      /**

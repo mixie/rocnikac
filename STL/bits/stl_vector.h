@@ -127,20 +127,22 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       { return allocator_type(_M_get_Tp_allocator()); }
 
       _Vector_base()
-      : _M_impl() { cerr<<"new,"<<c.getNumber()<<",vector"<< "\n"; }
+      : _M_impl() {cerr <<c.getNumber() <<",new"<<",vector\n"; }
 
       _Vector_base(const allocator_type& __a)
-      : _M_impl(__a) {cerr<<"new,"<<c.getNumber()<<",vector"<< "\n"; }
+      : _M_impl(__a) {cerr <<c.getNumber() <<",new"<<",vector\n"; }
 
       _Vector_base(size_t __n)
       : _M_impl()
       { _M_create_storage(__n);  
-      cerr<<"new,"<<c.getNumber()<<",vector"<< "\n";}
+     cerr <<c.getNumber() <<",new"<<",vector\n"; 
+      cerr <<c.getNumber()<<",resize,"<<__n<<"\n";}
 
       _Vector_base(size_t __n, const allocator_type& __a)
       : _M_impl(__a)
       { _M_create_storage(__n); 
-      cerr<<"new,"<<c.getNumber()<<",vector"<< "\n"; }
+     cerr <<c.getNumber() <<",new"<<",vector\n"; 
+     cerr <<c.getNumber()<<",resize,"<<__n<<"\n"; }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
       _Vector_base(_Tp_alloc_type&& __a)
@@ -649,6 +651,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       void
       resize(size_type __new_size)
       {
+      cerr <<this->c.getNumber()<<",resize,"<<__new_size<<"\n";
 	if (__new_size > size())
 	  _M_default_append(__new_size - size());
 	else if (__new_size < size())
@@ -669,6 +672,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       void
       resize(size_type __new_size, const value_type& __x)
       {
+        cerr <<this->c.getNumber()<<",resize,"<<__new_size<<"\n";
 	if (__new_size > size())
 	  insert(end(), __new_size - size(), __x);
 	else if (__new_size < size())
@@ -689,6 +693,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
       void
       resize(size_type __new_size, value_type __x = value_type())
       {
+        cerr <<this->c.getNumber()<<",resize,"<<__new_size<<"\n";
 	if (__new_size > size())
 	  insert(end(), __new_size - size(), __x);
 	else if (__new_size < size())
@@ -754,9 +759,8 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       reference
       operator[](size_type __n)
-      { cerr <<this->c.getNumber() <<",operator[],"<< __n<<","<<*(this->_M_impl._M_start + __n)<<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n<<"\n";
         return *(this->_M_impl._M_start + __n); }
-
       /**
        *  @brief  Subscript access to the data contained in the %vector.
        *  @param __n The index of the element for which data should be
@@ -770,7 +774,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
        */
       const_reference
       operator[](size_type __n) const
-      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<","<<*(this->_M_impl._M_start + __n) <<"\n";
+      { cerr <<this->c.getNumber() <<",operator[],"<< __n <<"\n";
         return *(this->_M_impl._M_start + __n); }
 
     protected:

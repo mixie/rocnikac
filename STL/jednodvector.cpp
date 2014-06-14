@@ -25,6 +25,7 @@ int main(){
 	for(int i=0;i<100;i++){
 		a.push_back(5);
 	}	
+	a.resize(500);
 	for(int i=0;i<5;i++){
 		b.push_back(10);
 	}	
