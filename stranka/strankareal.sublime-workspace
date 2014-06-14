@@ -1,0 +1,384 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"F",
+				"FUN_DS"
+			],
+			[
+				"parse",
+				"parseInt(string, radix?)"
+			],
+			[
+				"circ",
+				"circle"
+			],
+			[
+				"a",
+				"attr	(?)"
+			],
+			[
+				"se",
+				"select(node)"
+			],
+			[
+				"con",
+				"console	{}"
+			],
+			[
+				"sele",
+				"selectAll(selector)"
+			],
+			[
+				"select",
+				"selectAll(nodes)"
+			],
+			[
+				"set",
+				"setSeconds(sec)"
+			],
+			[
+				"d",
+				"putImageData"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 566,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "main.js",
+			"settings":
+			{
+				"buffer_size": 509,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "strankareal.sublime-project",
+			"settings":
+			{
+				"buffer_size": 164,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 96.0,
+		"selected_items":
+		[
+			[
+				"proj",
+				"Project: Add Folder"
+			],
+			[
+				"Tern",
+				"TernJS: Reload"
+			],
+			[
+				"Package Control: In",
+				"Package Control: Install Package"
+			],
+			[
+				"Install",
+				"Package Control: Install Package"
+			],
+			[
+				"Instal",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"$FileName",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/maja/Documents/Matfyz/rocnikac/strankareal/strankareal2.sublime-project",
+		"/home/maja/Documents/Matfyz/rocnikac/stranka/index.html",
+		"/home/maja/Documents/Matfyz/rocnikac/dcs/aaa.js",
+		"/home/maja/Documents/ksp/vstupy4_2/geneman33.sh",
+		"/home/maja/Documents/ksp/vstupy4_2/geneman.sh",
+		"/home/maja/Documents/ksp/vstupy4_2/geneman2.sh",
+		"/home/maja/Documents/ksp/vstupy4_2/geneman3.sh",
+		"/home/maja/Documents/Matfyz/rocnikac/kniznice/jednodvector.cpp",
+		"/home/maja/Documents/ksp/4seria/chyby.tex",
+		"/home/maja/Documents/ksp/vstupy4_2/geneman22.sh",
+		"/home/maja/Documents/Matfyz/rocnikac/dcs/sth.html",
+		"/home/maja/Documents/Matfyz/rocnikac/kniznice/vector",
+		"/home/maja/Documents/Matfyz/rocnikac/stranka/ps302.pdf",
+		"/home/maja/Documents/ksp/4seria/prikl1.tex",
+		"/home/maja/Documents/ksp/generator.cpp",
+		"/home/maja/mojeProgramy/os/vajdova.c",
+		"/home/maja/Documents/ksp/vstupy4_2/vzorak.cpp",
+		"/home/maja/Documents/ksp/4seria/prikl2.tex",
+		"/home/maja/Documents/ksp/vstupy4_2/geneman.cpp",
+		"/home/maja/Documents/ksp/generatorkalendar.cpp",
+		"/home/maja/mojeProgramy/adamko.cpp",
+		"/home/maja/mojeProgramy/os/oscv1.c",
+		"/home/maja/mojeProgramy/os/oscv2.c",
+		"/home/maja/mojeProgramy/os/osdu1.c",
+		"/home/maja/mojeProgramy/os/osdu10.c",
+		"/home/maja/pas.txt",
+		"/home/maja/mojeProgramy/programko3/dcs/fsfsd.js",
+		"/home/maja/mojeProgramy/programko3/dcs/aaa.js",
+		"/home/maja/mojeProgramy/programko3/dcs/sth.html",
+		"/home/maja/mojeProgramy/programko3/dcs/skuska.sublime-project",
+		"/home/maja/mojeProgramy/programko3/dcs/.settings/org.eclipse.wst.jsdt.ui.superType.name",
+		"/home/maja/mojeProgramy/programko3/dcs/.settings/org.eclipse.wst.jsdt.ui.superType.container",
+		"/home/maja/mojeProgramy/programko3/dcs/.settings/.jsdtscope",
+		"/home/maja/mojeProgramy/programko3/dcs/.project",
+		"/home/maja/.config/sublime-text-3/Packages/User/TernJS.sublime-settings",
+		"/home/maja/sth.js",
+		"/home/maja/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/maja/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"					   		\n",
+			"cerr",
+			"514220",
+			" \n",
+			"exit (",
+			"ppx",
+			"ccx",
+			"cp",
+			"pp",
+			"algorithm",
+			"tern_ar",
+			"tern",
+			"js"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"exit(",
+			"cp",
+			"pp",
+			"ccx",
+			"ppx"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 566,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "main.js",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 509,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								506,
+								506
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "strankareal.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 164,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								162,
+								162
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "strankareal.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 229.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
