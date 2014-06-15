@@ -1,33 +1,18 @@
-function preprocess(val){
-	var pov=[]; //pocet uvodnych prvkov
-	var initial=[]; 
-	var good = ["operator[]"];
-	var others = ["insert","push_back"];
+function preprocess(val,svg){
 	var ds=[]; //new riadky
-
 	for(v in val){
 		if(val[v].funDS=="new"){
-			ds.push(val[v]);
-			pov.push(0);
-			initial.push(true);
-		}else{
-			if($.inArray(val[v].funDS,good) && initial[val[v].numDS]){
-				pov[val[v].numDS]=Math.max(pov[val[v].numDS],val[v].valDS);
-			}else if($.inArray(val[v].funDS,others)){
-				initial[val[v].numDS]=false;
-			}	
+			var ds_at={num:val[v].numDS,name:val[v].valDS};
+			ds.push(ds_at);
 		}
 	}
-	console.log(pov);
-	console.log(ds);
-	console.log(val);
-	zobrazform(ds,pov,val);
+	zobrazform(ds,val,svg);
 }
 
-function zobrazform(ds,pov,val){
+function zobrazform(ds,val,svg){
 	$("#form").html("");
 	for(d in ds){
-		var inp="<input type='checkbox' name='dschbox' value='"+ds[d].numDS+"' id='"+ds[d].numDS+"'>"+ds[d].valDS+" "+ds[d].numDS+"</input></br>";
+		var inp="<input type='checkbox' name='dschbox' value='"+ds[d].num+"' id='"+ds[d].num+"'>"+ds[d].name+" "+ds[d].num+"</input></br>";
 		console.log(inp);
 		$('#form').append(inp);
 	}
@@ -37,7 +22,7 @@ function zobrazform(ds,pov,val){
 		$("input[type='checkbox']:checked").each(function(){
 			vybrane.push($(this).attr("id"));
 		});
+		draw_labels(val,ds,svg,0);
 		console.log(vybrane);
-		
 	}); 
 }
