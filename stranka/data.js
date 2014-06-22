@@ -41,6 +41,7 @@ dataHandler.prototype.haveNext=function(){
 	if(this.i==this.getN()){
 		return false;
 	}else{
+		console.log("jhdashdkjahdsdsadasdasdasdsa");
 		return true;
 	}
 }

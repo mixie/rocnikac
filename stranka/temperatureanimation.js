@@ -94,6 +94,7 @@ temperatureanimation.prototype.showAndGetLabel=function(value,x,y,color,size){
 }
 
 temperatureanimation.prototype.globalAfterActions=function(value){
+	console.log("AAAjksakassaas");
 	draw(this.dataHandler,this);
 }
 
@@ -104,13 +105,8 @@ temperatureanimation.prototype.globalDuringActions=function(value) {
 }
 
 temperatureanimation.prototype.zobraz_label=function(value){
-	var a=this;
-	var c=value;
-		console.log(value.numDS+"value4");
+	console.log(value.numDS+"value4");
 	this.label.animate(2000, '>', 1000)
-	.during(function(){
-			console.log(value.numDS+"value22");
-			a.globalDuringActions(c);
-	})
+	.during(this.globalDuringActions(value))
 	.after(this.globalAfterActions(value));
 }
