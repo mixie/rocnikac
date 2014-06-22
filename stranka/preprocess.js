@@ -22,7 +22,7 @@ function zobrazform(ds,val,svg){
 		$("input[type='checkbox']:checked").each(function(){
 			vybrane.push($(this).attr("id"));
 		});
-		draw_labels(val,ds,svg,0);
+		draw(val,ds,svg,0,vybrane);
 		console.log(vybrane);
 	}); 
 }

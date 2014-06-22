@@ -20,4 +20,8 @@ $(document).ready(function(){
 	});
 });
 
+var global={
+	var data=null;
+	var svg=null;
+};
 
