@@ -1,9 +1,12 @@
+//MAKE JAVASCRIPT LIBRARY!!! - NAKONIEC
+
 $(document).ready(function(){
 	var NUM_DS="numDS";
 	var FUN_DS="funDS";
 	var VAL_DS="valDS";
 	var fileInput = document.getElementById('fileInput');
 	var svg = SVG('svgdiv');
+	glob.svg=svg;
 	$('#submit').click(function(e) {
 		var file=fileInput.files[0];
 		var reader = new FileReader();
@@ -12,16 +15,12 @@ $(document).ready(function(){
 			obsah=NUM_DS+","+FUN_DS+","+VAL_DS+"\n"+obsah;
 			var val=d3.csv.parse(obsah);
 			//console.log(val);
-			preprocess(val,svg);
+			glob.data=val;
+			console.log(glob.data);
+			preprocess(val);
 		}
 		if(file!="undefined"){
 			reader.readAsText(file);	
 		}
 	});
 });
-
-var global={
-	var data=null;
-	var svg=null;
-};
-

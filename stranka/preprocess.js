@@ -1,4 +1,5 @@
-function preprocess(val,svg){
+function preprocess(val){
+	console.log(glob.data);
 	var ds=[]; //new riadky
 	for(v in val){
 		if(val[v].funDS=="new"){
@@ -6,10 +7,11 @@ function preprocess(val,svg){
 			ds.push(ds_at);
 		}
 	}
-	zobrazform(ds,val,svg);
+	zobrazform(ds,val);
 }
 
-function zobrazform(ds,val,svg){
+function zobrazform(ds,val){
+	console.log(glob.data);	
 	$("#form").html("");
 	for(d in ds){
 		var inp="<input type='checkbox' name='dschbox' value='"+ds[d].num+"' id='"+ds[d].num+"'>"+ds[d].name+" "+ds[d].num+"</input></br>";
@@ -22,7 +24,10 @@ function zobrazform(ds,val,svg){
 		$("input[type='checkbox']:checked").each(function(){
 			vybrane.push($(this).attr("id"));
 		});
-		draw(val,ds,svg,0,vybrane);
+		var dh=new dataHandler(vybrane, ds);
+		var anim=new temperatureanimation(true,dh);
+		console.log(anim.label);
+		draw(dh,anim);
 		console.log(vybrane);
 	}); 
 }
