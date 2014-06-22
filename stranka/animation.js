@@ -1,7 +1,7 @@
 function animation(haveLabels,dataHandler) {	
 	this.haveLabels=haveLabels;
-	var label=null;
-	var x=100,y=200,color='#f06',size=1;
+	this.label=null;
+	this.x=100;this.y=200,this.color='#f06',this.size=1;
 	if(haveLabels==true){
 		label=glob.svg.text("").move(x,y).fill(color).scale(size,size); //glob.svg.text("").move(x,y).fill(color).scale(size,size);
 	}
@@ -74,10 +74,11 @@ animation.prototype.globalDuringActions=function(value) {
 
 animation.prototype.showAndGetLabel=function(value,x,y,color,size){
 		if(value==null){
-			label=glob.svg.text("").move(x,y).fill(color).scale(size,size);
+			this.label=glob.svg.text("").move(x,y).fill(color).scale(size,size);
 			return label;
 		}else{
-			label.text(dataHandler.toString()).move(x,y).fill(color).scale(size,size);
+			console.log("BAF!!!");
+			this.label.text(dataHandler.toString()).move(x,y).fill(color).scale(size,size);
 			return;
 		}
 }
