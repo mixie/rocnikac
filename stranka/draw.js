@@ -1,17 +1,11 @@
 function draw(dataHandler,animation) {
-		console.log(animation.label);
 		decide(dataHandler,animation);
 }
 
 function decide(dataHandler,animation) {
 	var dh=dataHandler;
-	//console.log(animation.vectorNew+"anima");
-	//console.log(dh+"dhhh");
-	console.log(dh.haveNext());
 	if(dh.haveNext()){
-		console.log("sajhsdkdsads");
 		var value=dh.next();
-		console.log(value+"value");
 		switch(dh.getName(value)){
 			case "vector":
 				switch(value.funDS){
@@ -32,7 +26,6 @@ function decide(dataHandler,animation) {
 			case "deque":
 				switch(value.funDS){
 					case "new":
-						console.log("BAF1");
 						animation.dequeNew(value);
 						break;
 					case "resize":

@@ -1,4 +1,4 @@
-function animation(haveLabels,dataHandler) {	
+function animation(haveLabels,dataHandler,nextButton) {	
 	this.haveLabels=haveLabels;
 	this.label=null;
 	this.x=100;this.y=200,this.color='#f06',this.size=1;
@@ -74,22 +74,24 @@ animation.prototype.globalDuringActions=function(value) {
 
 
 animation.prototype.showAndGetLabel=function(value,x,y,color,size){
-		console.log("BAF");
-			console.log(value+"value3");
-			console.log(this.dataHandler.toText(value));
 		if(value==null){
 			this.label=glob.svg.text("asddsadsadas").move(this.x,this.y).fill(this.color).scale(this.size,this.size);
 			return this.label;
 		}else{
-			console.log("BLEBLEBLE");
 			this.label.text(this.dataHandler.toText(value)).move(this.x,this.y).fill(this.color).scale(this.size,this.size);
 			return;
 		}
 }
 
 animation.prototype.globalAfterActions=function(value){
-	console.log("AAAjksakassaas");
-	draw(this.dataHandler,this);
+	var temp=this;
+	if(!this.nextButton){
+		draw(this.dataHandler,this);
+	}else{
+		$("#next").click(function () {
+			draw(temp.dataHandler, temp);
+		})
+	}
 }
 
 animation.prototype.globalDuringActions=function(value) {

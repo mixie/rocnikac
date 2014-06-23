@@ -25,9 +25,9 @@ function zobrazform(ds,val){
 			vybrane.push($(this).attr("id"));
 		});
 		var dh=new dataHandler(vybrane, ds);
-		var anim=new temperatureanimation(true,dh);
+		var anim=new temperatureanimation(true,dh,false);
 		console.log(anim.label);
 		draw(dh,anim);
 		console.log(vybrane);
-	}); 
+	});
 }

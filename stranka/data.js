@@ -1,12 +1,10 @@
 function dataHandler(selected,dataStructs) {
 	this.values=glob.data;
-	console.log(glob.data);
 	this.selected=selected;
 	this.dataStructs=dataStructs;
 	this.i=0;
 	this.numberOfProcessed=[];
 	for(var j=0;j<this.selected.length;j++){
- 		console.log(this.selected[j]);
  		this.numberOfProcessed[this.selected[j]]=0;
   	}
 }
@@ -34,14 +32,11 @@ dataHandler.prototype.next=function() {
 
 dataHandler.prototype.haveNext=function(){
 	while(this.i<this.getN() && this.selected.indexOf(this.values[this.i].numDS)==-1){
-			console.log(this.i);
-			console.log(this.values[this.i].numDS);
 			this.i++;
 	}
 	if(this.i==this.getN()){
 		return false;
 	}else{
-		console.log("jhdashdkjahdsdsadasdasdasdsa");
 		return true;
 	}
 }
@@ -52,4 +47,8 @@ dataHandler.prototype.getName=function (value) {
 
 dataHandler.prototype.toText=function(value) {
 	return this.dataStructs[value.numDS].name + value.numDS + value.funDS + value.valDS;
+}
+
+dataHandler.prototype.DStoText=function(value) {
+	return this.dataStructs[value.numDS].num +" "+this.dataStructs[value.numDS].name;
 }
