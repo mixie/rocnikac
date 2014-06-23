@@ -106,8 +106,16 @@ temperatureanimation.prototype.globalDuringActions=function(value) {
 }
 
 temperatureanimation.prototype.zobraz_label=function(value){
-	console.log(value.numDS+"value4");
-	this.label.animate(20000, '>', 10000).move(1,1)
-	.during(this.globalDuringActions(value))
-	.after(this.globalAfterActions(value));
+	var tr=true;
+	var temp=this;
+	this.label.animate(1000, '>', 1000)
+	.during(function() {
+		if(tr){
+			tr=false;
+			temp.globalDuringActions(value);	
+		}
+	})
+	.after(function(){
+		temp.globalAfterActions(value);
+	});
 }
