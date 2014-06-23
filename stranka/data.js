@@ -4,11 +4,13 @@ function dataHandler(selected,dataStructs) {
 	this.selected=selected;
 	this.dataStructs=dataStructs;
 	this.i=0;
-	this.numberOfProcessed;
-	numberOfProcessed=[];
-	for(var j=0;j<this.dataStructs.length;j++){
-		numberOfProcessed.push(0);
+	this.numberOfProcessed=[];
+	console.log(selected);
+	for(var j=0;j<this.selected.length;j++){
+		console.log(this.selected[j]);
+		this.numberOfProcessed[this.selected[j]]=0;
 	}
+	console.log(this.numberOfProcessed)
 }
 
 dataHandler.prototype.getN=function() {
@@ -26,7 +28,7 @@ dataHandler.prototype.next=function() {
 	if(this.i==this.getN()){
 		return null;
 	}else{
-		numberOfProcessed[this.values[this.i].numDS]+=1;
+		this.numberOfProcessed[this.values[this.i].numDS]+=1;
 		this.i++;
 		return this.values[this.i-1];
 	}
