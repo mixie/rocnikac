@@ -83,6 +83,7 @@ temperatureanimation.prototype.setInsert=function (value) {
 temperatureanimation.prototype.showAndGetLabel=function(value,x,y,color,size){
 		console.log("BAF");
 			console.log(value+"value3");
+			console.log(this.dataHandler.toText(value));
 		if(value==null){
 			this.label=glob.svg.text("asddsadsadas").move(this.x,this.y).fill(this.color).scale(this.size,this.size);
 			return this.label;
@@ -106,7 +107,7 @@ temperatureanimation.prototype.globalDuringActions=function(value) {
 
 temperatureanimation.prototype.zobraz_label=function(value){
 	console.log(value.numDS+"value4");
-	this.label.animate(2000, '>', 1000)
+	this.label.animate(20000, '>', 10000).move(1,1)
 	.during(this.globalDuringActions(value))
 	.after(this.globalAfterActions(value));
 }

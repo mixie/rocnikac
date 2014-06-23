@@ -1,0 +1,21 @@
+najprv si zistim, ci zadane cisla su hned vedla seba, alebo je medzi nimi este jedno cislo (cizstim to tak, ze odcitam vacsie od mensieho, ak vysledok je vacsi ako mensie
+cislo (mensie z 2 zadanych), znamena to, ze medzi dvoma zadanymi cislami je este 1, ak vysledok rozdielu je mensi ako mensie cislo, znamena to, ze idu za sebou).
+potom som si tam uprvail ak by nahodou na vstupe nastalo to, ze najprv bude vacsie a potom mensie cislo. potom som si rozdelil problem na 2 casti
+
+1) ak cisla na vstupe su za sebou
+klasicky odcitam mensie cislo od vacsieho (mensie cislo je premena "b", vacsie "c", vysledok rozdielu "d"), dam si do "c" hodnotu mensieho cisla, a do "b" hodnotu vysledku.
+tym padom sa to moze odcitanie opakovat (d:=c-b). toto opakujeme az dokial nevide vysledok vacsi ako je mensi clen rozdielu (ak d>=b), pricom sa na to pozerame pri
+kazdom odcitani, a to z dvovodu ze ak je vysledok vacsi (alebo rovni, kedze sa nemozu 2 cisla z postupnosti rovnat) ako mensi clen rozdielu, znamena to, ze vysledok, 
+ktory nam vysiel uz nepatri do postupnosti, a teda vypisem posledne "b","c"
+
+2) ak je medzi cislami na vstupe este jedno cislo
+ak zistim, ze je medzi 2 cislami este 1 cislo, hned si ho mozem dat do premenej "c", a potom odcitat premenu "b" zo vstupu uz od neho, pretoze cislo, ktore bolo medzi je uz
+urcite minimalne mensie ako cislo "c" zo vstupu (a teda ak by aj postupnost dalej neisla, tak druhe najmensie cislo bude to medzi, nie to vacsie zo vstupu). ked som si 
+spravil nove "c" z cisla, ktore bolo medzi cislami vstupu, mozem odcitat tak isto ako v 1), pricom tiez pozeram na d>=b. na konci vypisem "b","c"
+
+casova zlozitost  O(log n) - (kedze neprechadzam vsetkymi cislami, ale stale sa mi to cislo zmensuje o velkost predosleho)
+pametova zlozitost O(1) 
+***********************************
+Super :)
+7b
+Maja
