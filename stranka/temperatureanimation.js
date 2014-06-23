@@ -11,11 +11,7 @@ function temperatureanimation(haveLabels,dataHandler) {
 	this.y=200;
 	this.color='#f06';
 	this.size=2;
-	this.sets=[];
-	for (var i = 0; i < this.selected.length; i++) {
-	//	this.sets[](glob.svg.set());
-	}
-	if(this.haveLabels==true){
+	if(haveLabels==true){
 		this.label=glob.svg.text("").move(this.x,this.y).fill(this.color).scale(this.size,this.size); //glob.svg.text("").move(x,y).fill(color).scale(size,size);
 	}
 	console.log("tusom2"+this.label);
@@ -39,6 +35,7 @@ temperatureanimation.prototype.vectorPush_back=function (value) {
 }
 
 temperatureanimation.prototype.dequeNew=function (value) {
+	console.log(value+"value2");
 	this.zobraz_label(value);
 }
 
