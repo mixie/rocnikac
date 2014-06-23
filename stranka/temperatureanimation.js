@@ -5,11 +5,12 @@ temperatureanimation.prototype.constructor=animation;
 function temperatureanimation(haveLabels,dataHandler) {	
 	this.haveLabels=haveLabels;
 	this.dataHandler=dataHandler;
+	this.selected=this.dataHandler.selected;
 	this.label=null;
 	this.x=100;
 	this.y=200;
 	this.color='#f06';
-	this.size=1;
+	this.size=2;
 	if(haveLabels==true){
 		this.label=glob.svg.text("").move(this.x,this.y).fill(this.color).scale(this.size,this.size); //glob.svg.text("").move(x,y).fill(color).scale(size,size);
 	}
@@ -78,38 +79,11 @@ temperatureanimation.prototype.setNew=function (value) {
 temperatureanimation.prototype.setInsert=function (value) {
 	this.zobraz_label(value);
 }
-
-
-temperatureanimation.prototype.showAndGetLabel=function(value,x,y,color,size){
-		console.log("BAF");
-			console.log(value+"value3");
-			console.log(this.dataHandler.toText(value));
-		if(value==null){
-			this.label=glob.svg.text("asddsadsadas").move(this.x,this.y).fill(this.color).scale(this.size,this.size);
-			return this.label;
-		}else{
-			console.log("BLEBLEBLE");
-			this.label.text(this.dataHandler.toText(value)).move(this.x,this.y).fill(this.color).scale(this.size,this.size);
-			return;
-		}
-}
-
-temperatureanimation.prototype.globalAfterActions=function(value){
-	console.log("AAAjksakassaas");
-	draw(this.dataHandler,this);
-}
-
-temperatureanimation.prototype.globalDuringActions=function(value) {
-	if(this.haveLabels){
-		this.showAndGetLabel(value,this.x,this.y,this.color,this.size);
-	}
-}
-
 temperatureanimation.prototype.zobraz_label=function(value){
 	var tr=true;
 	var temp=this;
 	this.label.animate(1000, '>', 1000)
-	.during(function() {
+	.during(function(){
 		if(tr){
 			tr=false;
 			temp.globalDuringActions(value);	
