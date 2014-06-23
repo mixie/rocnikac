@@ -63,22 +63,38 @@ animation.prototype.setInsert=function (value) {
 };
 
 animation.prototype.globalAfterActions=function(value){
-	draw(dataHandler,this);
+	draw(this.dataHandler,this);
 }
 
 animation.prototype.globalDuringActions=function(value) {
-	if(haveLabels){
-		showAndGetLabel(value,x,y,color,size);
+	if(this.haveLabels){
+		showAndGetLabel(value,this.x,this.y,this.color,this.size);
 	}
 }
 
+
 animation.prototype.showAndGetLabel=function(value,x,y,color,size){
+		console.log("BAF");
+			console.log(value+"value3");
+			console.log(this.dataHandler.toText(value));
 		if(value==null){
-			this.label=glob.svg.text("").move(x,y).fill(color).scale(size,size);
-			return label;
+			this.label=glob.svg.text("asddsadsadas").move(this.x,this.y).fill(this.color).scale(this.size,this.size);
+			return this.label;
 		}else{
-			console.log("BAF!!!");
-			this.label.text(dataHandler.toString()).move(x,y).fill(color).scale(size,size);
+			console.log("BLEBLEBLE");
+			this.label.text(this.dataHandler.toText(value)).move(this.x,this.y).fill(this.color).scale(this.size,this.size);
 			return;
 		}
 }
+
+animation.prototype.globalAfterActions=function(value){
+	console.log("AAAjksakassaas");
+	draw(this.dataHandler,this);
+}
+
+animation.prototype.globalDuringActions=function(value) {
+	if(this.haveLabels){
+		this.showAndGetLabel(value,this.x,this.y,this.color,this.size);
+	}
+}
+

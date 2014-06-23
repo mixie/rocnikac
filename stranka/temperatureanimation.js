@@ -10,10 +10,14 @@ function temperatureanimation(haveLabels,dataHandler) {
 	this.y=200;
 	this.color='#f06';
 	this.size=1;
-	if(haveLabels==true){
+	if(this.haveLabels==true){
 		this.label=glob.svg.text("").move(this.x,this.y).fill(this.color).scale(this.size,this.size); //glob.svg.text("").move(x,y).fill(color).scale(size,size);
 	}
-	console.log("tusom2"+this.label);
+	this.sets=[];
+ 	for (var i = 0; i < this.dataHandler.selected.length; i++) {
+ 		this.sets[this.dataHandler.selected[i]]=glob.svg.set();
+ 	}
+	console.log(this.sets);
 }
 
 temperatureanimation.prototype.vectorNew=function (value) {
@@ -80,34 +84,12 @@ temperatureanimation.prototype.setInsert=function (value) {
 }
 
 
-temperatureanimation.prototype.showAndGetLabel=function(value,x,y,color,size){
-		console.log("BAF");
-			console.log(value+"value3");
-			console.log(this.dataHandler.toText(value));
-		if(value==null){
-			this.label=glob.svg.text("asddsadsadas").move(this.x,this.y).fill(this.color).scale(this.size,this.size);
-			return this.label;
-		}else{
-			console.log("BLEBLEBLE");
-			this.label.text(this.dataHandler.toText(value)).move(this.x,this.y).fill(this.color).scale(this.size,this.size);
-			return;
-		}
-}
-
-temperatureanimation.prototype.globalAfterActions=function(value){
-	console.log("AAAjksakassaas");
-	draw(this.dataHandler,this);
-}
-
-temperatureanimation.prototype.globalDuringActions=function(value) {
-	if(this.haveLabels){
-		this.showAndGetLabel(value,this.x,this.y,this.color,this.size);
-	}
-}
-
 temperatureanimation.prototype.zobraz_label=function(value){
 	var tr=true;
 	var temp=this;
+	$('#stop').click(function() {
+		temp.label.stop();	
+	});
 	this.label.animate(1000, '>', 1000)
 	.during(function() {
 		if(tr){
