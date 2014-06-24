@@ -16,6 +16,7 @@ function temperatureanimation(haveLabels,dataHandler,nextButton) {
 	}
 	this.sets=[];
 	this.setsLen=[];
+	this.rectSet=glob.svg.set();
  	for (var i = 0; i < this.dataHandler.selected.length; i++) {
  		this.sets[this.dataHandler.selected[i]]=glob.svg.set();
  		this.setsLen[this.dataHandler.selected[i]]=0;
@@ -58,7 +59,7 @@ temperatureanimation.prototype.newDS=function(value) {
 	var temp=this;
 	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.DSlabels.x, this.rect.dist*this.DSlabels.counter);
 	$('#stop').click(function() {
-		temp.DSlabel.stop();	
+		DSlabel.stop();	
 	});
 	this.DSlabels.counter++;
 	this.addToSet(value.numDS,DSlabel);
@@ -83,16 +84,20 @@ temperatureanimation.prototype.resizeDS=function(value){
 		for(var j=value.valDS-diff;j<value.valDS;j++){
 			var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
 			.move(this.rect.sizex*j,this.rect.dist*value.numDS)
-			.radius(5)
-			.fill(this.rectColor.at(0).toHex);
+			.radius(0)
+			.fill(this.rectColor.at(1).toHex);
 			this.addToSet(value.numDS, rect);
 			newSet.add(rect);
+			this.rectSet.add(rect);
 		}
-		newSet.animate(2000,'=',2000).fill(this.rectColor.at(1).toHex()).during(function () {
+		$("#stop").click(function() {
+			newSet.stop();
+		});
+		newSet.animate(2000,'=',2000).fill(this.rectColor.at(0).toHex()).during(function () {
 			temp.globalDuringActions(value);
 		}).after(function () {
 			temp.globalAfterActions(value);
-		})
+		});
 	}
 }
 
@@ -176,18 +181,40 @@ temperatureanimation.prototype.zobraz_label=function(value){
 	});
 }
 
+temperatureanimation.prototype.changeColor=function(fill,changeR,changeG,changeB){
+	var col=new SVG.Color(fill);
+	console.log(col);
+	var color=col.toRgb();
+	var rgb = color.substring(4, color.length-1)
+         .replace(/ /g, '')
+         .split(',');
+   	rgb[0]=Math.max(rgb[0]-changeR,0);
+   	rgb[1]=Math.max(rgb[1]-changeG,0);
+   	rgb[2]=Math.max(rgb[2]-changeG,0);
+   	var rgbstring="rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+   	console.log(rgbstring);
+   	col=new SVG.Color(rgbstring);
+   	console.log("CTOH:"+col.toHex());
+   	return col.toHex();
+}
+
 
 
 temperatureanimation.prototype.globalAfterActions=function(value){
+	this.changeColor("#FFFFFF", 1,2,3);
 	var temp=this;
-	for(var i=0;i<this.sets.length;i++){
-		this.sets[i].each(function() {
-			if(temp.sets[i].index(this)!=0){
-				console.log(this);			
-				console.log("rx:"+this.attr('rx'));
-				this.radius(this.attr('rx')+1);
-			}
+	this.rectSet.animate(100,"=",100).after(function () {
+		temp.rectSet.each(function () {
+			var newCol=temp.changeColor(this.attr("fill"),1,2,3);
+			this.attr("fill",newCol);
 		});
+	});
+	console.log("TUTUTU");	
+	if(!this.nextButton){
+		draw(this.dataHandler,this);
+	}else{
+		$("#next").click(function () {
+			draw(temp.dataHandler, temp);
+		})
 	}
-	animation.prototype.globalAfterActions.call(this,value);
 }

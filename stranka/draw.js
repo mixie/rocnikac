@@ -3,6 +3,7 @@ function draw(dataHandler,animation) {
 }
 
 function decide(dataHandler,animation) {
+	console.log("here");
 	var dh=dataHandler;
 	if(dh.haveNext()){
 		var value=dh.next();
