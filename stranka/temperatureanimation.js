@@ -100,6 +100,8 @@ temperatureanimation.prototype.resizeDS=function(value){
 		}).after(function () {
 			temp.globalAfterActions(value);
 		});
+	}else{
+
 	}
 }
 
@@ -116,17 +118,7 @@ temperatureanimation.prototype.vectorOperator=function (value) {
 }
 
 temperatureanimation.prototype.operatorDS=function (value) {
-	var temp=this;
-	console.log("SETS:"+this.sets[value.numDS]);
-	var rect=this.sets[value.numDS].get(value.valDS);
-	this.playStopPause(rect);
-	rect.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
-	.fill(temp.rect.color)
-	.during(function () {
-		temp.globalDuringActions(value);
-	}).after(function  () {
-		temp.globalAfterActions(value);
-	})
+	this.accessToRect(value, value.numDS, value.valDS);
 }
 
 temperatureanimation.prototype.vectorPush_back=function (value) {
@@ -175,11 +167,27 @@ temperatureanimation.prototype.dequePush_front=function (value) {
 }
 
 temperatureanimation.prototype.dequeFront=function (value) {
-	this.zobraz_label(value);
+	this.accessToRect(value, value.numDS, 0);
+}
+
+temperatureanimation.prototype.accessToRect=function (value,ds,pos) {
+	var temp=this;
+	console.log(ds+' '+pos);
+	pos++;
+	console.log(this.sets[ds].get(pos));
+	var rect=this.sets[ds].get(pos);
+	this.playStopPause(rect);
+	rect.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
+	.fill(temp.rect.color)
+	.during(function () {
+		temp.globalDuringActions(value);
+	}).after(function  () {
+		temp.globalAfterActions(value);
+	});
 }
 
 temperatureanimation.prototype.dequeBack=function (value) {
-	this.zobraz_label(value);
+	this.accessToRect(value, value.numDS, this.setsLen[value.numDS]-1);
 }
 
 temperatureanimation.prototype.dequePop_back=function (value) {
@@ -195,25 +203,9 @@ temperatureanimation.prototype.setNew=function (value) {
 }
 
 temperatureanimation.prototype.setInsert=function (value) {
-	this.zobraz_label(value);
+	this.push_backDS(value);
 }
 
-
-temperatureanimation.prototype.zobraz_label=function(value){
-	var tr=true;
-	var temp=this;
-	this.playStopPause(this.label);
-	this.label.animate(1000, '>', 1000)
-	.during(function() {
-		if(tr){
-			tr=false;
-			temp.globalDuringActions(value);	
-		}
-	})
-	.after(function(){
-		temp.globalAfterActions(value);
-	});
-}
 
 temperatureanimation.prototype.changeColor=function(fill,changeR,changeG,changeB){
 	var col=new SVG.Color(fill);
