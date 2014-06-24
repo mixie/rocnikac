@@ -15,8 +15,10 @@ function temperatureanimation(haveLabels,dataHandler,nextButton) {
 		this.label=glob.svg.text("").move(this.x,this.y).fill(this.color).scale(this.size,this.size); //glob.svg.text("").move(x,y).fill(color).scale(size,size);
 	}
 	this.sets=[];
+	this.setsLen=[];
  	for (var i = 0; i < this.dataHandler.selected.length; i++) {
  		this.sets[this.dataHandler.selected[i]]=glob.svg.set();
+ 		this.setsLen[this.dataHandler.selected[i]]=0;
  	}
  	console.log(this.sets);
 	this.DSlabels={
@@ -27,24 +29,40 @@ function temperatureanimation(haveLabels,dataHandler,nextButton) {
 		delay:1000,
 		type:'='
 	}
-	this.outX=500;
+	this.rectColor=new SVG.Color("#f08").morph("#FFFFFF");
+	this.rect={
+		outX:500,
+		sizex:20,
+		sizey:20,
+		color:"#f08",
+		color_fade:"#FFFFFF",
+		dist:100
+	}
 }
 
 temperatureanimation.prototype.setLen=function(set){
 	console.log(set);
+	console.log(set.get(0));
 	return set.index(set.last())+1; //BUG
+}
+
+temperatureanimation.prototype.addToSet=function  (setIndex,content) {
+	this.sets[setIndex].add(content);
+	this.setsLen[setIndex]+=1;
+	return;
 }
 
 temperatureanimation.prototype.newDS=function(value) {
 	console.log(this.sets);
 	var tr=true;
 	var temp=this;
-	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.DSlabels.x, this.DSlabels.y*this.DSlabels.counter);
+	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.DSlabels.x, this.rect.dist*this.DSlabels.counter);
 	$('#stop').click(function() {
 		temp.DSlabel.stop();	
 	});
 	this.DSlabels.counter++;
-	this.sets[value.numDS].add(DSlabel);
+	this.addToSet(value.numDS,DSlabel);
+	console.log(this.sets[value.numDS].get(0));
 	DSlabel.animate(this.animConstants.length,this.animConstants.type,this.animConstants.delay)
 	.during(function() {
 		if(tr){
@@ -59,8 +77,23 @@ temperatureanimation.prototype.newDS=function(value) {
 temperatureanimation.prototype.resizeDS=function(value){
 	var tr=true;
 	var temp=this;
-	console.log(value.numDS);
-	console.log(this.setLen(this.sets[value.numDS]));
+	var diff=value.valDS-this.setsLen[value.numDS];
+	var newSet=glob.svg.set();
+	if(diff>0){
+		for(var j=value.valDS-diff;j<value.valDS;j++){
+			var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
+			.move(this.rect.sizex*j,this.rect.dist*value.numDS)
+			.radius(5)
+			.fill(this.rectColor.at(0).toHex);
+			this.addToSet(value.numDS, rect);
+			newSet.add(rect);
+		}
+		newSet.animate(2000,'=',2000).fill(this.rectColor.at(1).toHex()).during(function () {
+			temp.globalDuringActions(value);
+		}).after(function () {
+			temp.globalAfterActions(value);
+		})
+	}
 }
 
 temperatureanimation.prototype.vectorNew=function (value) {
@@ -141,4 +174,20 @@ temperatureanimation.prototype.zobraz_label=function(value){
 	.after(function(){
 		temp.globalAfterActions(value);
 	});
+}
+
+
+
+temperatureanimation.prototype.globalAfterActions=function(value){
+	var temp=this;
+	for(var i=0;i<this.sets.length;i++){
+		this.sets[i].each(function() {
+			if(temp.sets[i].index(this)!=0){
+				console.log(this);			
+				console.log("rx:"+this.attr('rx'));
+				this.radius(this.attr('rx')+1);
+			}
+		});
+	}
+	animation.prototype.globalAfterActions.call(this,value);
 }
