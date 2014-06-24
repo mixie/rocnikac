@@ -26,8 +26,8 @@ function temperatureanimation(haveLabels,dataHandler,nextButton) {
 		x:10,y:100,color:'#f08',size:1,counter:0
 	}
 	this.animConstants={
-		length:1000,
-		delay:1000,
+		length:200,
+		delay:200,
 		type:'='
 	}
 	this.rect={
@@ -58,9 +58,7 @@ temperatureanimation.prototype.newDS=function(value) {
 	var tr=true;
 	var temp=this;
 	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.DSlabels.x, this.rect.dist*this.DSlabels.counter);
-	$('#stop').click(function() {
-		DSlabel.stop();	
-	});
+	this.playStopPause(DSlabel);
 	this.DSlabels.counter++;
 	this.addToSet(value.numDS,DSlabel);
 	console.log(this.sets[value.numDS].get(0));
@@ -80,6 +78,7 @@ temperatureanimation.prototype.resizeDS=function(value){
 	var temp=this;
 	var diff=value.valDS-this.setsLen[value.numDS];
 	var newSet=glob.svg.set();
+	this.playStopPause(newSet);
 	console.log(value.numDS);
 	if(diff>0){
 		for(var j=value.valDS-diff;j<value.valDS;j++){
@@ -120,6 +119,7 @@ temperatureanimation.prototype.operatorDS=function (value) {
 	var temp=this;
 	console.log("SETS:"+this.sets[value.numDS]);
 	var rect=this.sets[value.numDS].get(value.valDS);
+	this.playStopPause(rect);
 	rect.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
 	.fill(temp.rect.color)
 	.during(function () {
@@ -130,6 +130,10 @@ temperatureanimation.prototype.operatorDS=function (value) {
 }
 
 temperatureanimation.prototype.vectorPush_back=function (value) {
+	this.push_backDS(value);
+}
+
+temperatureanimation.prototype.push_backDS=function  (value) {
 	var tr=true;
 	var temp=this;
 	var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
@@ -138,6 +142,7 @@ temperatureanimation.prototype.vectorPush_back=function (value) {
 			.fill(this.rect.color_fade);
 	this.addToSet(value.numDS, rect);
 	this.rectSet.add(rect);
+	this.playStopPause(rect);
 	rect.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
 		.fill(temp.rect.color)
 		.during(function () {
@@ -162,7 +167,7 @@ temperatureanimation.prototype.dequeOperator=function (value) {
 }
 
 temperatureanimation.prototype.dequePush_back=function (value) {
-	this.zobraz_label(value);
+	this.push_backDS(value);
 }
 
 temperatureanimation.prototype.dequePush_front=function (value) {
@@ -197,9 +202,7 @@ temperatureanimation.prototype.setInsert=function (value) {
 temperatureanimation.prototype.zobraz_label=function(value){
 	var tr=true;
 	var temp=this;
-	$('#stop').click(function() {
-		temp.label.stop();	
-	});
+	this.playStopPause(this.label);
 	this.label.animate(1000, '>', 1000)
 	.during(function() {
 		if(tr){

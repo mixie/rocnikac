@@ -94,6 +94,18 @@ animation.prototype.globalAfterActions=function(value){
 	}
 }
 
+animation.prototype.playStopPause=function (object) {
+	$("#play").click(function () {
+		object.play();
+	})
+	$("#pause").click(function () {
+		object.pause();
+	})
+	$("#stop").click(function () {
+		object.stop();
+	})
+}
+
 animation.prototype.globalDuringActions=function(value) {
 	if(this.haveLabels){
 		this.showAndGetLabel(value,this.x,this.y,this.color,this.size);

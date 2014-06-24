@@ -1,0 +1,19 @@
+deque:
+	konstruktor
+	resize
+	operator[]
+	front
+	back
+	push_front
+	push_back
+	pop_front
+	pop_back
+set:
+	konstruktor
+	insert
+	
+vector:
+	konstruktor
+	resize
+	operator[]
+	push_back
