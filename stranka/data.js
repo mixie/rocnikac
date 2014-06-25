@@ -46,7 +46,7 @@ dataHandler.prototype.getName=function (value) {
 }
 
 dataHandler.prototype.toText=function(value) {
-	return this.dataStructs[value.numDS].name + value.numDS + value.funDS + value.valDS;
+	return this.dataStructs[value.numDS].name +' '+ value.numDS +' '+ value.funDS +' '+ value.valDS;
 }
 
 dataHandler.prototype.DStoText=function(value) {

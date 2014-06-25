@@ -18,7 +18,7 @@ function zobrazform(ds,val){
 		console.log(inp);
 		$('#form').append(inp);
 	}
-	$('#form').append("<input type='submit' name='sub2' id='sub2' value='s1'>");
+	$('#form').append("<input type='submit' name='sub2' id='sub2' value='choose'>");
 	$('#sub2').click(function(e){
 		var vybrane=[];
 		$("input[type='checkbox']:checked").each(function(){
