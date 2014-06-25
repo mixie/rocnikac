@@ -101,13 +101,13 @@ animation.prototype.globalAfterActions=function(value){
 animation.prototype.playStopPause=function (object) {
 	$("#play").click(function () {
 		object.play();
-	})
+	});
 	$("#pause").click(function () {
 		object.pause();
-	})
+	});
 	$("#stop").click(function () {
 		object.stop();
-	})
+	});
 }
 
 animation.prototype.globalDuringActions=function(value) {

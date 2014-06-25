@@ -6,6 +6,7 @@ function temperatureanimation(haveLabels,dataHandler,nextButton,length,delay) {
 	this.haveLabels=haveLabels;
 	this.dataHandler=dataHandler;
 	this.nextButton=nextButton;
+	var temp=this;
 	this.label=null;
 	this.x=100;
 	this.y=20;
@@ -291,9 +292,5 @@ temperatureanimation.prototype.globalAfterActions=function(value){
 	});
 	if(!this.nextButton){
 		draw(this.dataHandler,this);
-	}else{
-		$("#next").click(function () {
-			draw(temp.dataHandler, temp);
-		});
 	}
 }

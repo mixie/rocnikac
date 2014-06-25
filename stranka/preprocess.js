@@ -14,18 +14,17 @@ function zobrazform(ds,val){
 	console.log(glob.data);	
 	$("#form").html("");
 	for(d in ds){
-		var inp="<input type='checkbox' name='dschbox' value='"+ds[d].num+"' id='"+ds[d].num+"'>"+ds[d].name+" "+ds[d].num+"</input></br>";
+		var inp="<input type='checkbox' name='dschbox' value='"+ds[d].num+"' id='"+ds[d].num+"'/><label for='"+ds[d].num+"'>"+ds[d].name+" "+ds[d].num+"</label></br>";
 		console.log(inp);
 		$('#form').append(inp);
 	}
-	$('#form').append("<input type='submit' name='sub2' id='sub2' value='choose'>");
-	$('#sub2').click(function(e){
-		var vybrane=[];
-		$("input[type='checkbox']:checked").each(function(){
-			vybrane.push($(this).attr("id"));
-		});
-		var dh=new dataHandler(vybrane, ds);
+	//$('#form').append("<input type='submit' name='sub2' id='sub2' value='choose'>");
 		$('#start').click(function(e) {
+			var vybrane=[];
+			$("input[type='checkbox']:checked").each(function(){
+				vybrane.push($(this).attr("id"));
+			});
+			var dh=new dataHandler(vybrane, ds);
 			var a;
 			$("input[type='radio']:checked").each(function(){
 				a=$(this).attr("id");
@@ -43,7 +42,11 @@ function zobrazform(ds,val){
 			if(a=="temperature"){
 					var anim=new temperatureanimation(labels,dh,next,length,delay);
 			}
+			$("#next").click(function (e) {
+				if(next){
+					draw(anim.dataHandler, anim);
+				}
+			});
 			draw(dh,anim);
 		});
-	});
 }

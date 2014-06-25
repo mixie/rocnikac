@@ -7,7 +7,7 @@ $(document).ready(function(){
 	var fileInput = document.getElementById('fileInput');
 	var svg = SVG('svgdiv').size(700,600);
 	glob.svg=svg;
-	svg.rect(700,600).attr("id","background");
+	//svg.rect(700,600).attr("id","background");
 	$('#submit').click(function(e) {
 		var file=fileInput.files[0];
 		var reader = new FileReader();
