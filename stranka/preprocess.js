@@ -25,9 +25,25 @@ function zobrazform(ds,val){
 			vybrane.push($(this).attr("id"));
 		});
 		var dh=new dataHandler(vybrane, ds);
-		var anim=new temperatureanimation(true,dh,false);
-		console.log(anim.label);
-		draw(dh,anim);
-		console.log(vybrane);
+		$('#start').click(function(e) {
+			var a;
+			$("input[type='radio']:checked").each(function(){
+				a=$(this).attr("id");
+			});
+			var length=$("#len").val();
+			var delay=$("#delay").val();
+			var labels=false;
+			var next=false;
+			if($("#next").prop("checked")){
+				next=true;
+			}
+			if($("#labels").prop("checked")){
+				labels=true;
+			}
+			if(a=="temperature"){
+					var anim=new temperatureanimation(labels,dh,next,length,delay);
+			}
+			draw(dh,anim);
+		});
 	});
 }
