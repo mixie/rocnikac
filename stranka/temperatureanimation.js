@@ -54,8 +54,9 @@ temperatureanimation.prototype.setLen=function(set){
 
 temperatureanimation.prototype.addToSet=function  (setIndex,content) {
 	this.sets[setIndex].add(content);
-//	console.log("SET1:"+this.sets[setIndex]+"setIndex"+setIndex);
 	this.setsLen[setIndex]+=1;
+	console.log(this.sets[setIndex].get(this.setsLen[setIndex]-1));
+	console.log("aaa");
 	return;
 }
 
@@ -82,12 +83,13 @@ temperatureanimation.prototype.newDS=function(value) {
 temperatureanimation.prototype.resizeDS=function(value){
 	var tr=true;
 	var temp=this;
-	var diff=value.valDS-this.setsLen[value.numDS];
+	var diff=value.valDS-this.setsLen[value.numDS]+1;
 	var newSet=glob.svg.set();
 	this.playStopPause(newSet);
 //	console.log(value.numDS);
 	if(diff>0){
 		for(var j=value.valDS-diff;j<value.valDS;j++){
+			console.log(j+" "+diff);
 			var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
 			.move(this.rect.dist+this.rect.sizex*j,this.rect.dist*this.vybraneConvert[value.numDS])
 			.radius(3)
@@ -116,8 +118,9 @@ temperatureanimation.prototype.accessToRect=function (value,ds,pos) {
 //	console.log(ds+' '+pos);
 	pos++;
 //	console.log(this.sets[ds].get(pos));
-	var rect=this.sets[ds].get(pos+1);
+	var rect=this.sets[ds].get(pos);
 	this.playStopPause(rect);
+	console.log(this.sets[0]+rect);
 	rect.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
 	.fill(temp.rect.color)
 	.during(function () {
