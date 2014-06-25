@@ -1,0 +1,772 @@
+systemove /aplikacne programy - systemove zavisle na pocitaci (procesore)
+Procesy
+    1 CPU - 1 process (naraz beziaci)
+    prepinanie medzi procesmi - multiprograovanie, vykonavanie jedneho procesu sekvencne
+Hierarchia procesov
+    Unix - spawning - vznik fork - ukoncenie exit / kill
+        pocas bootu - swapper (0) - planovac procesov a CPU - riadi operacie planovanie procesov
+            - ten vytvori init (1) - vsetky uzivatelske procesy su jeho potomkami
+                -ten zisti pocet termionalov, pre kazdy term spusti getty
+                    -getty caka na prihlasenie , spusti login (argument meno/heslo)
+                        -login cita z /etc/passwd, ak ok tak spusti shell
+    MS-DOS - existuje prikaz na vykonanie bin. sub. ako potomka - ale rodic je pozastaveny (narozidel od Unixu)
+Stavy procesov
+    Running - Ready - Blocked/Sleeping - Created(vytvoreny) - Zombie(ukonceny)
+    b/s - caka na udalost (napr. ukoncenie v/v operacie)
+    created - vytvoreny ale este nebol zaradeny os medzi spustatelne procesy
+    zombie - vyradeny spomedzi spustatelny os-om (alebo sa ukoncil sam/inym procesom),
+             nieje mozne spustit ale tabulky a informacie spojene s nim este existuju (napr. koli "uctovaniu")
+    prechody:
+        null->vytvoreny
+        vytvoreny->pripraveny - ked os moze prijat dalsi proces (moze byt nastavena hranica, zamedzujuca
+            velkemu mnozstvu procesov koli vykonu(moze byt zalozena aj na mnozstve virt.pam. pridelenej proces.))
+        pripraveny->beziaci - vyberie jeden z pripravenych
+        beziaci->ukonceny
+        beziaci->pripraveny - napr. TLE ale pride proces s vyssou prioritou
+        beziaci->blokovany - poziadal o nieco na co musi cakat (v/v, iny proces)
+        blokovany->pripraveny - the happening (stromy zasumia a ludia skacu z budov)
+        pripraveny->ukonceny - napr. rodicovsky proces moze v niektorych systemoch ukoncit potomka
+            alebo skonci rodicovsky -> moze byt ukonceny potomok
+        blokovany->ukonceny - -||-
+    ready queue / blocked queue - koli efektivite blocked queue pre kazdu udalost(premiestni sa (aj) cela do rq)
+Swapovanie
+    -zlepsenie vykonnosti - napr. vsetky proc. blokovane, niekedy treba uvolnit miesto v pamati (lebo ho tam
+        uz viac nieje)
+    nove stavy - swapped/blocked - swapped/ready
+    neoplati sa do pamate prenasat predtym odswapovany a stale blokovany proces
+    prechody:
+        blokovany->s/b - ak nie su pripravene ziadne procesy , aspon jeden blokovany sa odswapuje
+            moze sa spravit aj ked su pripravene , ale zla vykonnost systemu
+        s/b->s/p - the happening (napr. vidlica v krku), cize system musi mat pristup k informacii o stave
+        s/p->pripraveny - nieje ziaden pripraveny , alebo nejaky swapped ma vyssiu prioritu (moze, nemusi,
+            je to za cenu horsieho vykonu)
+        pripraveny->s/p - ak to velmi treba (napr. jediny sposob ako ziskat dost pamate), alebo niekedy lepsie
+            odswapovat ready proces s nizsou prioritou ako blocked s vyssou ak sa predpoklada ze bude skoro
+            odblokovany
+        vytvoreny->s/p - namiesto do pripraveny, ked nieje v pamati dost miesta pre novy proces
+    prechody na uzivatelskej urovni (vykonatelne procesom):
+        null->vytvoreny(tj. vytvori novy proces),beziaci->blokovany,beziaci->zombie(exit)
+Popis procesu
+    os si udrzuje tabulky o kazdej entite ktoru spravuje
+        pamatove tabulky - info o pamati - jej prideleni procesom , ochrane a pod
+        v/v tabulky - sprava v/v zariadeni - volne/pridelene procesu, ak sa vykonava operacia - stav operacie,
+            miesto v hlavnej pamati, ktore sa pouziva ako zdroj/ciel v/v prenosu
+        tabulky suborov - info o suboroch umiestnenie na disku, stav , ine atributy
+        tabulky procesov - info o .. nikdy neuhadnes com .. kde su umiestnene a atributy procesov
+    Umiestnenie procesu
+        proces - vykonavany program , mnozina datovych miest pre lok. a glob. premenne a const.,zasobnik,
+            mnozstvo atributov potrebne pre riadenei procesu os - riadiaci blok procesu (process control block)
+        obraz procesu (process image) - program + data+ zasobnik +atributy
+        v najjednoduchsom pripade image ako jeden blok, v modernych os pozostava z mnoziny blokov, nemusia byt
+        suvisle za sebou, aby mohol byt spusteny musi byt image v hlavnej pamati, inak mozu byt do hlavnej pam.
+        zavedele len niektore casti procesu, ostatne ostanu na disku - virtualna pamat
+        tabulka procesov musi obsahovat informaciu o umiestneni imageu
+    Atributy procesov
+        informacie zapisane v riadiacom bloku, vo vseobecnosti:
+        Identifikacia procesu - PID (ident. cislo),PID rodica,UID(ident. vlastnika procesu)
+        Informacie o stave p. - obsah registrov - vseobecnych, riadiacich, stavovych(PSW), stack pointer
+        Informacie o riadeni p. - pridavna info potreba pre os pre riadenie a koordinaciu aktivnych p. , 
+            informacia o planovani a stave procesu (stav,priorita,identifikacia udalosti na ktoru caka, info
+                pre planovanie procesov)
+            informacie o stave v/v (pridelene v/v prostriedky, zoznam otvorenych suborov)
+            informacie pre "administrativu" (cas CPU, limity na cas)
+            informacie o vyuzivanej pamati (smernik na tabulku stranok alebo segmentov)
+            informacie o komunikacii medzi procesmi ("flagy",signaly,spravy pouzivane pre komunikaciu procesov)
+Synchronizacia a komunikacia procesov
+    subeznost (concurrency) - mnozstvo problemov - komunikacia medzi procesmi, zdielanie a sutazenie o
+        prostriedky, synchronizacia aktivit procesov a pridelovanie procesoroveho casu procesom
+    poziadavky pri navrhu os
+        - musi byt schopny spravovat rozne aktivne procesy
+        - musi pridelovat a uvolnovat rozne prostriedky (procesorovy cas,pamat,subory,v/v zariadenia) kazdemu 
+            aktivnemu procesu
+        - musi chranit data a fyzicke prostriedky kazdeho procesu pred neumyselnym zasahom ineho procesu
+        - vysledky procesu musia byt nezavisle od rychlosti vykonavania vzhladom na rychlost subeznych procesov
+    offtopic - tlacenie - spool directory - printer daemon pozera dnu ci je co tlacit, vytlacene zmaze
+    race conditions - casova zavislost procesov - vysledok zavysi od toho v akom poradi prebiehaju - zle!
+    treba zakazat viac ako jednemu procesu citanie a zapis zdielanych dat - mutual exclusion
+    kriticky usek - usek v ktorom proces pritupuje k zdielanej pamati/suborom - ak nikdy nebudu dva procesy
+        naraz v kritickom useku (prisluchajucom k danym datam) zabrani sa race conditions
+    kriteria na vyriesenie problemu vylucenia(zamedzenie race conditions nestaci):
+        - ziadne dva procesy naraz v kritickomn useku spojenom s rovnakym zdielanym prostriedkom
+        - pokial proces do kritickeho useku vstupi , v konecnom case z neho vystupi
+        - ak nieje proces v krit. useku , nebrani inym procesom donho vstupit
+        - kazdy z procesov ziadajuci vstup do krit. u. bude uspokojeny (me gusta) v konecnom case
+        - ziadne predpoklady o relativnej rychlosti procesov alebo poctu prenosov
+Navrhy na dosiahnutie vzajomneho vylucenia
+    hardwarove riesenia
+        znemoznenie prerusenia - po vstupe do krit. useku, umoozni prerusenie az po odchode z neho (vratane 
+            preruseni od hardwaru), nevhodne pre uzivatelske procesy, ak ma pocitac viac ako 2 CPU tyka sa len
+            jedneho, vhodne riesenie pre samotny kernel ked updatuje premenne alebo zoznamy
+        specialna instrukcia TSL - Test and Set Lock - operacia TSL cita obsah pamatoveho slova do registra a
+            ulozi na povodne miesto (pam. slovo) nenulovu hodnotu (napr. 1) - vsetko v jedno instr. cykle
+            (nedelitelne), riadenie pristupu pomocou TSL - nacita sa slovo (flag), ak bolo predtym 0 tak sa vojde
+            do krit. useku , ak bolo 1 caka, po ukonceni krit useku nastavi flag na 0 (instr. MOVE)
+    softwareove riesenia
+        predpokladaju elementarne vzajomne vylucenie na urovni pristupu do pamate (pristup na to iste miesto
+            je seriovany spravou pamate)
+        uzamykacie premenne - lock najskor 0, ked chce proces vtupit do k.u. pozrie lock, ak moze nastavi na 1
+            vstupi do krit. u. , po vystupe nastavi 0 , inak caka, moze nastat chyba ak sa prepne medzi pozeranim
+            na lock a nastavenim locku - vstupia dva procesy naraz
+        striktne striedanie - raz jeden proc. v kritickom , raz druhy - premenna turn, jeden moze vstupit do krit
+            ked sa = 0 , druhy ked 1, ak je jeden ovela pomalsi tak moze branit druhemu vstupu do krit useku aj
+            ked je v nekritickom (porusene 3. kriterium)
+        petersonovo riesenie (dekker vymyslel jedno skor ale prilis komplikovane cize sa nepouzivalo) -
+            pole interested[proces],premena turn , ked ide vstupit tak turn=proces, interested[proces]=true,
+            caka kym plati ze turn=proces a interested[iny_proces]=true
+        vsade cine cakanie - problem, okrem horsieho vykonu tiez priority inversion problem - ak proces s 
+            vyssou prioritou cinne caka na proces s nizsou, ktory sa koli tomu nevie dostat k procesoru, bude
+            proces s vyssou cakat do nekonecna
+    podpora os alebo programovacieho jazyka - blokovanie
+        sleep/wakeup - systemove volania, sleep - proces blokovany kym ho iny proces nezobudi - parameter
+            wakeup je spiaci proces, s/w nieje sucastou standartnej c-kniznice, ale pravdepodobne pristupny v
+            lub systeme ktory ma tieto volania - problem ak sa strati wakeup signal (priklad producent-konzument)
+            ked sa vola sleep ked ma producent plno/ konzument prazno, ak sa zavola wakeup medzi tym ako jeden
+            checkol ci ma spat a naozaj zaspal - riesenie wakeup waiting bit (ked nespi a wakeupne tak wakeup
+            caka do uspania a vynuluje ho), problem pri viacerych procesoch - viac wakeup waiting bitov (semafor)
+        semafory - >=0, dve operacie - P(down) - ak nula sleep , inak -1, V(up) +1, ak je na semafore spiaci
+            proces moze dokoncit down, up/down atomicke - priklad prod/konz (str40)
+        monitory - mnoz. procedur,premennych,dat strukt. zjednotenych do spec. druhu modulu/balika, zvonka sa
+            neda priamo pristupovat k dat. strukt. monitora, vzdy len jeden proces aktivny v monitore (vacs.
+            sa na to pouziva bin. semafor), condition variables - sposob na zablokovanie procesov ked nemozu
+            byt vykonavane - operacie na nich - wait , signal, ked procedura monitora zisti ze nemoze pokracovat
+            vykona wait na cond. variabli (co umozni inemu procesu vstupit do monitoru), ta potom moze zavolat 
+            signal ktory zobudi spiaci proces (jeden z viacerych ak ich caka viac), signal len ako uplne 
+            posledny prikaz procedury monitora (po jeho vykonani proces opusti monitor), wait signal podobny
+            sleep wakeup ale kedze vzdy len jeden proces v monitore , nemoze sa stat problem s wakeupom
+        monitory musia byt zabudovane v prog. jazyku , na realiz. semaforov staci pridat dve assembler rutiny
+        do kniznice, problem s oboma pri viacero CPU s vlastnou pamatou (spojene napriklad LAN), potrebne tiez
+        nieco na vymenu informacii medzi pocitacmi (vymena sprav)
+Komunikacia medzi procesmi
+    posielanie sprav
+        primitivy (operacie) send(ciel,&sprava),recieve(zdroj,&sprava)
+    synchronizacia
+        send moze byt blokovany kym nebude sprava prijata, recieve kym nejaka sprava nepride
+        blokovany send aj receive - rendezvous
+        neblokovany send blokovany receive - pravdepodobne najuzitocnejsie
+        neblokovany send neblokovany receive
+        pri multiprogramovani casto neblokovany send (odosle sa a pracuje dalej)
+        blokovany receive - vacsinou proces potrebuje informaciu zo spravy - ak sa ale sprava stratila/nebola
+            odoslana tak zostane blokovany na vzdy
+        mozny tiez pristup kedy pred vykonanim receive proces testuje ci nejaka sprava necaka
+    adresovanie
+        priame - send explicitne pomenuje adresata, receive viacero moznosti
+            - explicitne pomenuje odosielatela - symetricka komunikacia
+            - implicitna adresacia - zdroj bude id posielajuceho procesu - asymetricka komunikacia
+        nepriame - odosielanie/prijimanie zo schranok (mailbox), procesy komunikuju len ak zdielaju schranku,
+            adresuju na jej id, schranka obvykle buffruje urcity pocet sprav
+        one-to-one(sukromna),one-to-many(broadcast),many-to-one(schranka=port),many-to-many
+        vlastnictvo schranky - bud proces (napr. many-to-one prijimajuci), vtedy schranka zanika spolu s procesom
+            alebo vlastni schranku os a na jej zrusenie pouzit explicitny prikaz
+    format sprav
+       fixna/variabilna dlzka
+       var.d. - header - typ spravy, ident. ciela/odosielatela, dlzka, riadiaca informacia (priorita,poradove
+        cislo a pod.), body (telo) - vlastny obsah spravy
+    zaradovanie sprav
+        najjednoduchsie FIFO, nemusi byt postacujuce - priorita na zaklade typu / urcenia odosielatela, dalsia
+        moznost umoznit prijimaciemu procesu prezret zoznam cakajucich a vybrat ktoru prijme najblizsie
+Problemy designu pre posielanie sprav
+    sprava sa moze stratit - potvrdzovacie spravy
+    jednoznacne urcenie procesov (proces@pocitac, pocitac:proces)
+    priklad prod/konz (str.45) - konzument posle producentovi prazdne spravy , producent ich "naplni" a posle s5
+        pocet sprav v systeme konstantny , kazdy z nich sa blokuje ked nema spravy k dispozicii
+    pipe - v unixe - mailbox bez hranic sprav - ked cita z rury dostane vsetky naraz (treba fixnu dlzku sprav
+        alebo specialny ukoncovaci znak napr. LF)
+Problem obedujucich filozofov (znamy, rovno riesenia)
+    - max 4 filozofi
+    - uchopi vidlicku len ak su obe volne
+    - asymetricke riesenie - jeden lavu/pravu , druhy pravu/lavu
+    - po chyteni lavej checkne pravu, ak neni polozi lavu a pocka - ak vsetci cakaju rovnako tak starvation
+    - to sa da riesit cakanim random casu (ale stale je tu miziva pravdepodobnost zaseknutia na dlhy cas)
+    - binarny semafor - ked ide jest down (potato!), moze jest len jeden ked teoreticky mozu dvaja
+    - maximalny paralelizmus pre lub. pocet filozofov - kazdy ma stav (rozmysla/hladny/jediaci), moze prejst
+        do stavy jediaci len ked ani jeden okolo neho neje - zabrani uviaznutiu ale jeden moze vyhladovat (!?)
+Problem citatelov a zapisovatelov (vela procesov cita data/ iba jeden moze pisat (a pri tom ziadny citat))
+    semafor - prvy citatel vykona down, posledny citatel po skonceni vykona up (a moze prist zapisovatel), 
+        citatelia maju vacsiu prioritu, dva semafory - jeden na pocet citatelov, druhy na db
+    kriticky region - riesenie s podporou os alebo prog. jazyka - kontrola uz pri kompilaci - shared premenne
+        definovane v deklaracii(:D), potom su pristupne iba v ich prislusnych regionoch -
+        var v: shared T; region v do S - kym sa vykonava S nema iny proces pristup k v
+        prekladac prideli premennej bin. semafor a kriticky region uzavrie prikazmi down up nad tymto semaforom
+    krit. region sa da efektivne pouzit na riesenie krit. useku , nie ale na niektore vseobecne prob. synch.
+    podmieneny kriticky region - region v when B do S - ak B true pokracuje, ak false caka kym true a zaroven
+        neexistuje iny proces v kritickom useku pre v (priklady strany 52,53)
+Uviaznutie
+    deadlock - dva alebo viacero procesov caka na splnenie podmienky ktora nikdy nenastane (jeden na druhy)
+    podmienky uvaznutia (preco nastava uviaznutie)
+        vzajomne vylucenie (mutual exclusion) - aspon jeden prostriedok moze byt v istom case vyuzivany len
+            jednym procesom
+        postupne ziskavanie prostriedkov s cakanim (hold and wait) - existuje proces ktory ziskava prostriedky
+            postupne v lub. poradi a caka kym mu bude prideleny ziadany prostriedok , pritom neuvolni uz ziskane
+        nemoznost prerozdelenia prostriedkov (no preemption) - ak proces ziska prostriedok, ziaden iny mu ho 
+            nevie odobrat - uvolnit ho vie len sam
+        cyklicke cakanie (circular wait) - jeden na druhy , druhy na treti, treti na prvy (to je zarovne neodst.)
+    prve 3 nutne, ale nie postacujuce , ale vdaka prvym trom moze nastat neodstranitelne cyklicke cakanie, cize
+    vsetky 4 dokopy - nutne a postacujuce
+    ignorovanie/detekcia a vyvedenie z uviaznutia/prevencia/dynamiecke vyhybanie sa
+    ignorovanie (the Ostrich algorithm - pstrosi pristup)
+        podla matematikou neakceptovatelne, inzinieri sa pytaju ako casto a ako vazne je uvaznutie
+        unixove tabulky - kazda obmedzeny prostriedok a potenciany zdroj uviaznutia - lepsie ako obmedzovat
+            uzivatelna (na 1 proces, 1 otvoreny subor)
+    detekcia a vyvedenie (deadlock detection and recovery)
+        system sleduje poziadavky an prostriedky a ich uvolnovanie a periodicky vykonava algoritmus zistujuci
+        ci nastala podmienka cykl. cakania - bud pri kazdej poziadavke na prostriedok - skor detekcia, algoritm.
+        je relativne jednoduchy - zalozeny na baze inkrementalnych zmien stavu systemu , ale aj tak to mina
+        vela casu procesora - alebo menej casta kontrola , podla toho ako je pravdepodobny vznik uviaznutia
+        jedna z moznosti - udrziavat graf procesov a prostriedkov - sleduje ci sa nevyskytne cyklus
+        ina moznost - hladat procesy ktore su sustavne blokovane viac ako isty cas (napr. 1hod), tie su ukoncene
+        vseobecny algoritmus - dve dvojrozmenrne matice (riadky - procesy, stlpce - prostriedky), jeden vektor
+            nepridelenych prostriedkov, alg. na strane 56, strategiou alg. je najst proces ktoreho poziadavky
+            na prostriedky mozu byt uspokojene dostupnymi prostriedkami,matice niesu binarne (!!)
+        riesenie ked os detekuje uviaznutie
+            -zrusi vsetky uviaznute procesy
+            -vratit procesy do checkpointu (rollback) a restartovat (cize ma povodny stav niekde ulozeny), 
+                problemom je ze moze znovu nastat povodne uviaznutie
+            -vybrat "obet" - proces ktory sa ukonci - ak to nepomoze pokracovat vo vybere obeti, vyber urcuje
+                priorita, rozpracovanost, pocty a druhy pridelenych prostriedkov , suvislost procesu s ostatnymi
+                procesmi atd.
+            -postupne prerozdelovat prostriedky kym nebude vyriesene uviaznutie (rollback procesov ktorym sa 
+            odstrania prostriedky)
+        metoda detekcie a vyvedenia casto v batch systemoch , kde je ukoncenie a restartovanie procesu zvycajne
+        akceptovatelne
+    prevencia (deadlock prevention)
+        neumoznenie jednej zo 4 podmienok uviaznutia
+            -vzajomne vylucenie - zdielany prostriedok nikdy nieje prideleny vylucne jednemu procesu - spooling -
+                viacere procesy generuju vystup do spolocneho adresara odkial ich jeden proces spracuva(tlacenie)
+                nieje pouzitelne vsade, uviaznutie moze vzniknut pri zaplnani disku, ak daemon caka kym bude k
+                dispozicii cely vystup
+            -postupne ziskavanie prostriedkov - donutit proces aby ziskal vsetky prostriedky naraz (neefektivne),
+                alebo predtym jak ziada novy prostriedok musi uvolnit vsetky co mal a potom ich ziska s5 aj s
+                novym
+            -nemoznost prerozdelenia prostriedkov - dat moznost odnat - najma pre prostriedky ktorych stav
+                je lahko ulozitelny (cpu registre , pamatovy priestor), mozne dva pristupy:
+                    -rovnako ako pri postupne zisk. (ak nejake drzi, uvolni a v pripade potreby ziska s5)
+                    -ak proces ziada prostriedky ktore niesu volne, najde sa iny proces tiez cakajuci prostriedky
+                        ktore niesu volne (a drziaci povodne), ak sa najde, odoberu sa mu a pridelia ziadajucemu,
+                        ak nie, ziadajuci proces caka a zatial mu mozu byt odobrane prostriedky
+            -cyklicke cakanie - viacero sposobov
+                -zaviest pravidlo - proces moze mat v danom momente len jeden prostriedok (nieje mozne napr.
+                    ak by kopiroval velky subor z pasky na tlaciaren)
+            -ocislovat vsetky prostriedky, procesy ziadaju o prostriedky v numerickom poradi (moze ziadat iba
+                prostriedok s vyssim cislom), proces s prostriedkom s najvyssim cislom moze ziadat iba z volnych,
+                alebo skoncit (a tym uvolnit prostriedky pre procesy s prost. s nizsimi cislami)
+            -podobne jak vyssie, ale viaze sa len na cisla prostriedkov ktore momentalne vlastni (cize ked uvolni
+                prostriedky s vysokym cislo moze ziadat zas od 1ky)
+            usporiadanie riesi problem uviaznutia ale nieje mozne najst usporiadanie ktore by vyhovovalo vsetkym
+            procesom
+        vylucenie jednej z prvych 3 podmienok uviaznutia - nepriama metoda prevencie, vyluc. cykl. - priama
+    vyhybanie sa (deadlock avoidance)
+        pripusta platnost vsetkych 4 podmienok , zamedzi sa ich sucasna platnost - menej obmedzuje procesy
+        a spravu prostriedkov, algoritmicka aj z hladiska dat. strukt. narocnejsia
+        odmietnutie spustenia procesu
+            znovu dvojrozmerne matice (A,MP), vektory C-celkove mnozstvo prostriedkov,V-volne prostriedky, oba
+            vektory maju vlekost rovnu poctu prostriedkov, A-pridelene prostriedky, MP-maximalne poziadavky
+            procesu na kazdy prostriedok, novy proces bude spusteny len ak jeho mp + suma mp (pre kazdy proces)
+            vsetkych beziacich procesov je <= ako suma c (pre dany proces) - nieje idealne , predpoklada ze
+            budu ziadat maximum prostriedkov vsetci naraz
+        odmietnutie pridelenia prostriedkov procesu - bankarov algoritmus - Dijkstra
+            na zaciatku znovu oznamia maximalne ziadane prostriedky, vzdy pred pridelenim prostriedku si os
+            overi, ci po nom dokaze najst poradie pridelovania ktorym by uspokojil vsetky poziadavky vsetkych
+            procesov - ak by sa to nedalo , prostriedok odmietne pridelit (str 59-60, na rovnakych maticiach
+            ako vyssie), v praxi sa nepouziva - malokedy vopred poznaju procesi mnozstvo potrebnych prostr.,
+            fixny pocet pridelovanych prostriedkov, ziadny proces nesmie skoncit bez uvolnenia prostriedkov
+Sprava procesov a procesora
+    priepustnost - throughput - mnozstvo uloh realizovanych v danom casovom intervale
+    cielom multiprogramovania (viac procesov strieda 1 CPU) - maximalizovat vyuzitie CPU
+    zoznam prirpavenych procesov (readu queue), zoznam prostriedkov - procesov cakajucich na prostriedok
+Planovace (pre CPU)
+    planovac uloh (planovac vyssej ulrovne, job scheduler, long-term scheduler, plan. na urovni spravy uloh)
+        pred zavedenim (cyklom ready->running->blocked), vybera zo zadanych uloch podmnozinu a zavadza ich
+        do systemu na spracovanie (vytvara pre ne procesy + PCB a prideluje procesom prostriedky)
+        -sleduje stav vsetkych uloh (aj prijate aj tie ktore este spracuva)
+        -prideluje ulohe vybratej na spracovanie prostriedky (pomocou dalsich modulov)
+        -po dokonceni ulohy prostriedky uvolnuje
+    planovac procesov (nizsej urovne, CPU scheduler, process scheduler,short time scheduler,na urovni pridelov.)
+        rozhoduje ktoremu z procesov bude prideleny procesor
+        -sleduje stav procesov (dispecer(dispatcher))-prevadza zmeny stavov procesu, synch.a komun. procesov
+        -rozhoduje ktoremu procesu bude prideleny procesor (planovac)
+        -prideluje/uvolnuje procesor (dispecer)
+    zakladny rozdiel vo frekvencii pouzivania
+        p.proc.-velka frekvencia,rychly aby nevznikali straty - trvale v operacnej pamati (sucast supervizora)
+        p.uloh -mensia frek.-vyvolava sa ked vstupi nova uloha do sys./uloha je ukoncena/procesor je dlho idle,
+            riadi stupen multiprogramovania (viac procesov - menej casu na kazdy)
+    vacsinu procesov rozdelit medzi orientovane na CPU a na V/V - dobry mix oboch (uloha p.uloh)
+    p.uloh na niektorych systemoch moze bytminimalny/neexistujuci - stabilita zavysi od fyz. obmedzeni/uzivatelov
+    systemy s virtualnou pamatou - planovac strednej urovne (medium-term scheduler) - na swapping (lepsi mix atd)
+Planovacie algoritmy
+    hl. cielom planovanie procesov - optimalivat jedno alebo viac kriterii spravania systemu (stanovena mnoz.
+    kriterii podla ktorej mozu byt jedntolive planovacie alg. ohodnotene) - uzivatelsky orientovane (spravanie
+    systemu z pohladu uzivatela/procesu) kriteria / systemovo orientovane (doraz na efektivne vyuzitie procesu)
+    kriteria
+    ine rozdelenie - vztahujuce sa na vykonavanie (kvantitativne kriteria, lahko meratelne)/nevztahujuce sa
+    na vykonavanie (kvalitativne, nelahko meratelne)
+    uzivatelsky orientovane, vztahujuce sa na vykonavanie
+        doba odozvy (response time) - minimalizovat, maximalizovat pocet uzivatelov ktori dostanu dobru odozvu
+        doba prechodu procesu systemom (turnaround time) - od zaciatku zadania procesu po ukoncenie vystupu,
+            v ratane cinnosti procesora a cakania na prostriedky, vhodna miera pre batch ulohy
+        terminy (deadlines) - ak su urcene, maximalizovat percent dodrzanych terminov
+    uzivatelsky orientovane,ostatne
+        predpovedatelnost - dlzka bezania a "ceny" ulohy co najmenej zavisla od zatazenia systemu
+    systemovo orientovane, vzth. na vyk.
+        priepustnost (throughput) - pocet procesov spracovanych za jednotku casu (maximalizovat)
+        vyuzitie procesora (processor utilization) - percento ktore procesor casuje, idealne <10%, vseobecne <40%
+    systemovo orientovane, ostatne
+        vyvazenie prostriedkov (balancing resources) - planovacia strategia moze vyuzivat prostriedky vyuzite,
+            uprednostnovane procesy ktore znizia zatazenie pretazenych prostriedkov, toto kriterium zahrna aj
+            planovanie na vyssej a strednej urovni
+    po vybrani kriteria sa dane krit. optimalizuje, ale vacsinou sa optimalizuje priemer
+    v interaktivnych systemoch dolezitejsie minimalizovat odchylky ako priemerny cas odozvy
+    normalizovana doba prechodu - podiel doby prechodu k dobe spracovania - relativne opozdenie procesu - cim
+    dlhsi cas spracovania , tym vacsie opozdenie mozno tolerovat, minimalna hodnota 1 (spusteny hned ako zadany)
+    rastuce hodnoty - klesajuca uroven obsluhy procesu
+    nepreemptivne (nonpreemptive) planovacie algoritmy
+        ked proces prejde do stavu beziaci, vykonava sa az kym neskonci alebo sa sam zablokuje (caka na v/v alebo
+        pozaduje sluzbu os)
+        strategia FCFS - first come first served
+            vhona aj pre planovac uloha , aj planovac procesov, FIFO, zvycajne mala vykonnost, pracuje lepsie
+            pre dlhsie procesy ako pre kratsie (ked maly proces pride tesne za velkym tak caka kym ten skonci)
+        SJF - shortest job first
+            uprednostnuje krastie pred dlhsimi - minimalizuje dobu cakania - minimalny priemerny cas cakania - 
+            problem - tazko poznat dlzku nasled. poziadavky - vhodne ked uzivatel zadava dlzku (penalizacia za
+            prekrocenie), alebo odhad casu na zaklade predoslych pouziti
+        Priorita
+            SJF specialny pripad priority, kazda uloha ma prioritu CPU prideluje ulohe s max. prioritou, rovnaka
+            priorita - FCFS, priority zadavane bud interne - meratel. velicina - obmedzenia casu, poziadavky na 
+            pamat, pocet otvorenych suborov; externe - katedra ktora zadava ulohu, kolko plati za pouzitie atd.
+            problem - trvale zablokovanie uloh s nizsou prioritou ked je vela s vyssou - aging (zvysujuca prior.)
+        HRN - highest response ration next (ration - pomer odpovedi)
+            priorita nielen funkcia casu pouzitia CPU ale aj cakania 
+            priorita(resposne-ration)=(cas cakania+cas spracovania)/cas spracovania
+            odstranuje zo SJF velke uproednostnovanie kratsich uloh pred dlhsimi
+    preemptivne planovacie algoritmy
+        moze prerusovat procesy (do stavu pripraveny - ked pride novy proces alebo periodicky na zaklade
+        prerusenia od hodin
+        SJF s pozastavenim - SRT - shortest remaining time
+            ked dojde nova uloha a ma kratsiu dobu pouzitia ako vykonavana tak dostane hned CPU
+        Prioritna strategia s pozastavenim
+            vyssia priorita - hned switche CPU
+        Round robin (RR) - cyklicke planovanie
+            vhodna pre systemy so zdielanim casu - rozumna doba odozvy
+            virtualizacia procesora - dojem viacerych procesorov kontinualne realizujucich procesy
+            definuje sa mala jednotka casu (cas. kvantum) + FIFO zoznam - kazdy proces bezi dany cas a potom sa
+                hodi na koniec zoznamu (process switch / context switch)
+            kvantum - nekonecno = FCFS, bliziace sa nule - teoreticky idealne (n procesorov s 1/n vyk. n-proces.)
+                to ale len pri nulovych rezijnych stratach - zvycajne sa pouziva 10-100ms kvantum
+        Mozne obmeny RR
+            -zaradovanie podla vyuzitia kvanta (ak cele na koniec zoznamu, ak len polovicu (napr. prerusenie v/v)
+                tak do polivce zoznamu) - vhodne pre ulohy s velkymi narokmi na v/v
+            -ked nedocerpal kvantum (v/v) tak auxiliary queue - pomocny zoznam - prednost pred zoznamom priprav.
+                proc., z pomocneho zoznamu do procesora len na zvysok nevycerpaneho kvanta
+            -alg. cyklickej obsluhy so spatnou vazbou - novy proces dostane najskor tolko kvant kolko obdrzala
+                kazda s ostatnych uloh v systeme , potom normalny RR
+            -limitovany alg. cyk. obsluhy - RR kym uloha nevycerpal vopred stanoveny limit - potom moze bezat
+                len ak v systeme niesu ine ulohy
+            -selfish RR (SRR) - kombinuje planovanie vyssej a nizsej urovne - pre nove ulohy delay queue - FCFS -
+                tam cakaju kym im nestupne priorita na neprejdu do RR
+        Strategia niekolkych zoznamov (multiple/multilevel queues)
+            vhodne ked sa daju ulohy rozdelit do viacerych skupin (napr. interaktivne a batch - rozdielne
+                poziadavky na cas prechodu)
+            rozdeluje zoznam pripravenych procesov do oddelenych zoznamov, kazdy s vlastnym algoritmom planovania
+            musi existovat planovanie medzi zoznamami - prioritne planovanie s pozastavenim
+            napr. batch FCFS, apl. RR sys. RR, priorita batch - najnizsie , sys. najvyssie - batch sa nevykona
+            pokial niesu ostatne zoznamy prazdne
+            pripradne rozdelenie casu medzi zoznamami
+        Strategia niekolkych zoznamov s premiestnenim (multilevel feedback queues)
+            moznost pre ulohu prechadzat medzi zoznamami, planovac ma nasledujuce parametre
+                -pocet zoznamov
+                -planovaci alg. pre kazdy zoznam
+                -metoda, ktora urcuje presun ulohy do zoznamu vyssej/nizsej priority
+                -metoda, ktora urcuje do ktoreho zoznamu sa zaradi uloha ked vstupuje medzi pripravene procesy
+            napr. zoznam podla dlzky kvanta - ak precerpa cele ide dole, ak neprecerpa ide hore
+    Policy vs mechanism (principy a pravidla rozhodovania vs mechanizmus)
+        niekedy vhodne oddelit mechanizmus (ten ostava v kernely) a policy (pravidla rozhodovania) , aby ich 
+        mohli upravovat uzivatelskymi procesmi (pravidla parametrizovane, uprava cez systemove volania) - napr.
+        ked rodicovsky proces vie ako efektivne riadit potomkov , lepsie ked urcuje on ako ked urcuje prioritu os
+Sprava pamate - modely realnej pamate
+    operacna pamat - zdielany prostriedok (procesy riadene sys. aj apl. prog) - poziadavky vybavuje sprava pamate
+    funkcie spravy pamate
+        -udrziavanie prehladu o pouzitych/nepouzitych miestach v operacnej pamati
+        -rozhodovanie o poradi obsluhovania poziadaviek na pridelenie priestoru v operacne pamati
+        -realizacia pridelenia
+        -realizacia uvolnenia pamate
+    poziadavky ktore musi sprava pamate podporovat
+        -relokacia
+        -ochrana
+        -zdielanie
+        -logicka organizacia
+        -fyzicka organizacia
+    relokacia - nieje mozne vediet vopred kde bude proces v pamati - moze sa v nej hybat (swap) - hw procesora a
+        os musia byt schopne vzdy transformovat odkazy na pam. miesta v programe na fyzicku adresu
+    ochrana - do adresneho priestoru procesu nesmie pristupovat iny bez povolenia, ochranu zabezpecuje procesor
+        (hardware) - os nemoze predvidat vsetky odkazy - platnost odkazu sa preveruje az pri vykonani instrukcie
+    zdielanie - musi umoznit kontrolovany pristup k zdielanym oblastiam pamate
+    logicka organizacia - hlavna pamat organizovana ako linearny (jednorozmerny) adr. priestor - postupnost
+        byteov alebo slov, vacsina programov ale organizovana do modulov (niektore read/exec only, ine data)
+            -moduly mozu byt pisane a kompilovane nezavisle , referencie medzi nimi riesene runtime
+            -roznym modulom moze byt priradeny rozny stupen ochrany
+            -je mozne zaviest mechanimy umoznujuce zdielat moduly viacerymi procesmi
+        prostriedok ktory najviac zodpoveda danym poziadavkam je segmentacia
+    fyzicka organizacia - pamat organizovana minimalne do dvoch urovni - hlavna (main) a pridavna (secondary), 
+        hlavna - rychli pristup pri vysokych nakladoch , nemoznost trvaleho ulozenia, disk (secondary) naopak,
+        hlavna - programy a data ktore sa prave pouzivaju, organizacka toku medzi main a second.-hl. uloha spravy
+Typy spravy pamate (historicky prehlad)
+    FAP - fyzicky adresny priestor, LAP - logicky adresny priestor
+    Jeden suvisly usek (monoprogramovanie)
+        iba jeden proces - operacny system na zaciatku FAP, zvysok pamate jeden beziaci proces
+    Staticke suvisle useky (fixed partitions)
+        fixny pocet usekov - rovnakej alebo roznej velkosti , ak roznej , pridelovanie - firstfit, bestfit,
+        mapovanie LAP->FAP - najcastejsie mapovaci register (0 LAP), jeho obsah def. pri spustani procesu
+        hranicny register - druhy mapovaci register - adresa za poslednym pamatovym miestom useku
+        nevyhody - fragmentacia - vnutorna (nevyuzite vramci prideleneho useku), vonkajsia (ziadny usek nema
+            dostatocnu kapacitu , ale spojenie volnych usekov by ju malo) - vnutorna minimalizovat cez best-fit,
+            vonkajsia planovacom uloh
+        system postacujuci pre systemy s davkovym spracovanim, pre systemy so zdielanim casu (viac uzivatelov nez
+            pamatep re ich procesy) je treba swapovanie, tam sa pouzivaju useky s premennou dlzkou
+    Dynamicke suvisle useky (variable partitions)
+        useky sa vytvaraju podla poziadaviek procesov ako prichadzaju
+        bestfit,firstfit,nextfit,worstfit
+        casto useky rovne nasobku zakladnej pamatovej pridelovacej jednotky
+        mozna defragmentacia - casovo narovna ak sa detekuej vznik vonkajsej fragmentacie
+        prehlad o volnych usekoch - spajany zoznam / bitova mapa
+    Buddy system
+        rozdelovanie pamati na dve , ked treba zaradit novy deli sa pamat na casti kym sa nenajde 2^(u-1)<s<=2^u,
+        ked su vedla seba dva useky rovnakej dlzky spoja sa do jedneho, zoznam pre kazdu velkost useku, pouziva
+        sa v niektorych paralelnych systemoch ako ucinny prostriedok na alok a uvol. paralelnych programov
+    Strankovanie
+        dve triedy algoritmov pre pridelovanie pamate procesu
+            -pridelia procesu vo FAP jeden suvisly priestor (vsetky predosle metody)
+            -pridelia procesu vo FAP priestor suvisly po castiach - cielom minimalizovat vonakjsiu fragment.
+        pamat sa rozdeli na useky rovnakej dlzky - ramce, LAP na rovnako velke useky - stranky
+        strankovanie - pridelovanie ramcov pamate strankam
+        priradenie adresy z LAP do FAP - tabulka stranok (page table PT) - zobrazenie LAP->FAP prevadza procesor
+            pri kazdom vstupe do pamate, LAP sa rozklada na dve zlozky - vyssie rady stranka,niz. offset na stran
+        cisla stranok pri pristupe do PT ako index, prislusna polozka obsahuje cislo ramca pre tuto stranku
+        dlzka ramca moznina 2, k=2^n , dolnych n bitov adresy je offset, obsah PT trvalo v zazname o procese,
+        fyzicka PT sa plni pri spustani procesu
+        sprava procesov moze vytvorit novu proces ak jej sprava pamate da dostatocny priestor (ramce) v pamati
+        k tomu si sprava mapati udrzuje tabulku ramcov (FT-frame table)
+        FT-dve zlozky - stavova - volny/obsahuje stranku procesu(akeho procesu), definicna - cislo stranky v ram.
+        niekedy sa LAP->FAP mozu prekryvat (zdielanie dat) - viac logickych do jedneho FAP
+        problemom ochrana strnaky 0 bity ochrany spojene so strankami (R/W,RO) uchovavane v PT
+        Implementacia tabulky stranok
+            -mnozina vyhradenych registrov - ked je PT pomerne mala, planovac procesov nahrava rovnako ako 
+                ostatne registre, modifikacia tychto registrov - len OS
+            -PT v hlavnej pamati a ukazuje do nej Page Table Base Register PTBR - vymena stranok len skrz zmenu
+                tohto registra, pomaly pristup k uzivatelskej pamati - 2 pristupy do pamate (1. do PT na urcenie
+                fyz. adresy , 2. pristup k samotnej adrese), pouziva sa cache - najprv sa hlada v nej, az potom
+                v PT v pamati (ak az v nej tak sa zaroven tato informacia nahra do cache), 8-16 asociativnych
+                registrov (cache) - 80-90% casu v nich najdeme potrebne
+        Zdielatelne stranky
+            moznost zdielania kodu medzi viacerymi procesmi (editory,kompilatory,db-systemi), musi byt 
+                reentrantny - nemenit sam seba - viac procesov ho vykonava v tom istom case, kazdy ma vlastnu
+                kopiu registrov v datovej oblasti
+    Segmentacia
+        program sa rozdeli na segmenty (nemusi byt pevna velkost ale dana max. velkost), pamatovy blok - kus FAP,
+        segmentacia - priradovanie pamatovych blokov segmentom
+        segmentacia programu manual/automat. - kazdy odkaz na adresu musi obsahovat urcenie segmentu
+        LAP->FAP - cislo segmentu - index do tabulky adries segmentov - Segment Map Table - obsahuje zaciatocne
+            adresy segmentov a ich velkost, potom sa porovna offset s velkostou - ak vacsi adresa neplatna, fyz.
+            adresa - zaciatocna adr. seg + offset
+        tabulka seg. trvale sucastou zaznamu o procese, transform. adresy procesorom pocas behu, moznost zdielat
+            segmenty viacerymi procesmi (moze prinasat problemy pri adresovani)
+        nevyhody - rovnako ako dynamicke suvisle useky, vacsinou lepsia fragmentacia (ale stale hrozy)
+        rozdiel strank. a segm. - segment "logicky", lubovolny rozsah, viditelny v pouzivatelskom programe (
+            zatial co stranka sa pouziva iba v module pridelovania pamate)
+    Kombinovane systemy
+        Segmented paging (PT je segmentovana)
+            24 bitova adresa - 12 bitov cislo stranky - 4096 stranok - 12bitov offset
+            ked je velka cast PT prazdna, segmentuje sa (horne 4 bity cislo segmentu - 16 poloziek pre seg. v
+                tabulke segmentov), mozno odstranut zbytocnu cast PT (nastavenie adresy segmentov na 0), worst
+                case 3 pristupy do pamate na pristup k adresovanemu miestu
+        Strankova segmentacia (Multics - segmenty su strankovane)
+            18 bit cislo segmentu , 16 bit offset, offset v segmente 6bit cislo stranky 10 bit offset v stranke
+            odstrani to vnutornu fragmentaciu
+Sprava pamate - modely virtualnej pamate
+    ak je LAP vacsi ako FAP - kedysi rozdelenie do overlayov (uloha programatora)
+    virtualna pamat - LAP mozep resahovat FAP , co presahuje sa drzi na disku
+    vacsinou strankovanie - adresy generovane programom - virtualne -> memory management unit (MMU) -> fyzicke
+    virtualny adr. priestor rozdeleny do stranok , fyzicky rozdeleny an ramce (rovnaka velkost), pouziva sa PT,
+    PT obsahuje present/absent-bit - ci je stranka v pamati - ak nieje - page fault - OS musi zavies pozadovanu
+    stranku do operacnej pamate a aktualizovat PT, ak nieje dost miesta v pamati treba najst ramec - obet - ktory
+    sa odswapuje (ak bola modifikovana od casu co je v operacnej pamati - ak nie, iba sa prepise novou)
+    strateny cas pri vypadku zavisi od:
+        -toho s akou pravdepodobnostou sa ziadaju stranky
+        -dlzky stranky (ak chceme redukovat rozsah tabulky stranok - vacsie stranky, ak vnutornu frag. - mensie)
+        -od vyberu obete (optimalne taku ktora nebude dlho pouzita - tento pristup nerealizovatelny)
+    Nahradzovacie algoritmy
+        FIFO (FIFO page replacement)
+            najstarsia sa vyhodi - vyhody - stranka nieje odstranena hned po zavedeni , nevyhody - stranka ktora
+            je pouzivana sustavne bude pravidelne vyradzovana; FIFO anomalia - zvacsanie poctu ramcov moze 
+            niekedy viest k zvyseniu poctu vypadkov (Beladyho FIFO anomalia)
+        NRU (not recently used page replacement)
+            pri kazdej stranke dva bity - R - refferenced M - modified - menia sa casto - musi to byt rychle - 
+            hardwareovo na 1ku , softwareovo (pomaly ale nie tak casto) na 0, na zaciatku vsetky 0, periodicky
+            (hodiny) sa R nuluje, ked je vypadok rozdelene do 4 kategorii 1- R0M0 2-R0M1 3-R1M0 4-R1M1 - obete
+            prednostne z nizsej triedy
+        Vylepsenia FIFO
+            -skrz R,M - najskor najstarsi triedy 0 atd..
+            -algoritmus druhej nadeje- FIFO s R , ak mala byt vyhodena a R=1 tak R=0 a na koniec zoznamu, pri
+                intenzivnej praci so strankami degraduje na FIFO
+        LRU (least recently used page replacement) - dlho nepouzite sa vyradia - velmi drahe, nizsie aprox.
+        NFU (not frequently used page replacement) - kazda stranka pocitadlo , pri kazdom preruseni od hodin
+            sa pocitadlo+=R, pri vypadku sa vyradi ta s najnizsim poc. (problem - na nic sa nezabuda)
+        Aging - vylepsene NFU s tym ze si nevedia stranky vopred nahrabat velke cisla ktore sa tazko prebiju - 
+            pri preruseni od hodin sa pocitadlo shiftne doprava a najvyssi bit sa zmeni na 1
+    Strankovanie na ziadost vs model s pracovnou mnozinou (demand paging vs working set model)
+        strankovanie na ziadost - zacina s prazdnou mnoz. stranok, postupne dochadzak vypadkom a nacitava
+        v praxi vacsina procesov pouziva malu cast svojich stranok - working set
+        v systemoch so zdielanim casu sa casto odsuvaju procesy na disk - co robit pri nacitani s5? (teoreticky
+            znovu postupne nacitavat vsetky stranky cez vypadky - to je ale pomale a mrha casom CPU (sprac
+            vypadku stranky trva niekolko ms))
+        model s pracovnou mnozinou - snazi sa sledovat pracovnu mnoz. stranok pre proces a nacitat ich do pamate
+            spolu s procesom, nacitanie stranok pred spustenim procesu - prepaging
+        identifikacia working set - nastavi sa (experimentalne) N - working set window - pouziva sa starnutie, s
+            tym ze ak si stranka drzi vo vrchnych N bitoch pocitadla 1-ku tak patri do working set
+    Lokalne vs globalne pridelovacie strategie
+        ci sa stranka vybera spomedzi stranok pridelenych procesu , alebo spomedzi vsetkych stranok
+        lokalne zodpoveda pridelenie pevneho miesta v pamati procesu , glob. dynamicky prideluje ramce medzi 
+            spustatelne procesy
+        lok. - urcit pocet ramcov pre kazdy proces - rovnomerne / pomerne (podla velkosti procesov)
+        vo vseobecnosti lepsie globalne , nama ked sa velkost pracovnej mnoz. pocas zivota procesu meni
+    Problemy pri implementacii
+        vyber mnoziny algoritmov spomedzi vyssie spomenutych +
+        Zalohovanie instrucii
+            ked nastane prerusenie pri vypadku stranky uprostred instrukcie treba instr. vykonat odznova - bez
+            zalohy niekedy nieje mozne - bud sa skopiruje PC do nejakeho registra (riesenie od tvorcov CPU) +
+            v dalsom registri si pamata ci neboli nejake registre auto-inkrementovane/dekrementovane
+            ine pristupi -
+                motorola - ulozi do zasobnika
+                vax - vrati sa do bodu pred vykonanim instrukcie
+                risc - necha vsetko tak , vsetko musi vyriesit OS
+        Zamykanie stranok v pamati
+            situacia - proces cita z v/v do buffera, medzitym iny proces sposobi vypadok stranky do ktorej cital-
+            data novej stranky sa prepisu castou vstupu z v/v - riesenie - zamykanie stranok pouzivanych pre v/v
+            alebo kernel robi v/v do vlastnych buffrov a az potom kopiruje uzivatelovi
+        Zdielanie stranok
+            oplati sa zdielat RO stranky (napriklad s kodom programu spustenom viacerymi pouzivatelmi)
+            mozne problemy - A a B zdielaju stranky , A sa odswapuje (spolu s nim zdielane stranky) - B vyvolava 
+            vela vypadkov, treba tiez riesit ked A skonci - zdielane stranky musia ostat v pamati
+    Virtualizacia pamate segmentaciou na ziadost
+        -adresny priestor programu rozdeleny na segmenty - logicke casti (procedury, data, zasobnik atd)
+        -ked nieje pozadovany segment v pamati - prerusenie - vypadok segmentu - OS musi najst pre segment 
+            priestor v pamati (zhustovanim , odsunom ineho) a zaviest ho do pamate
+        -nevyhodou cast zlozite pridelovanie pamati
+Sprava pamate v Unixe
+    Swapovanie
+        riadene swapperom , odswapovat proces treba ak - 
+            fork potrebuje pamat pre potomka
+            systemove volanie brk pozaduje zvacsit datovy segmet
+            stack narastol a presiahol vyhradeny priestor
+            treba do pamate presunut odsvapovany proces ktory tam bol prilis dlho tak casto treba swapnut dalsi
+        vyber obete
+            najprv blokovane - ak ich je viac tak ten ktory ma najvyssi sucet priority a casu v pamati
+            ak ziadny blokovany tak z pripravenych podla rovnakeho kriteria
+        swap do pamate
+            kazdych niekolko sekund pozrie ci nejaky nieje pripraveny - ak ano swapne ho (najskor tie co su na
+            disku dlhsie), to robi az kym - ziaden proc. na disku nieje pripraveny / nieje mozne uvolnit miesto
+            v pamati (proces nemoze byt odswapovany z pamate ak v nej nieje aspon 2 sekundy)
+        evidencia volneho miesta - linkovanny zoznam volnych usekov
+    Strankovanie
+        staci aby "user structure" a PT boli v pamati a proces moze byt naplanovany na spracovanie
+        pozadovane stranky nahravane do pamate dynamicky
+        ak "user structure" a PT nie su v pamati, proces nemoze bezat kym ich swapper nenahra do pamate
+        berkley unix nepouziva working set, vax nema reference bity
+        strankovacie implementovane ciastocne kernelom , ciastocne novym procesom - page daemon (2) - ten 
+            pravidelne kontroluje ci je pocet volnyc hstranok v pamati prilis nizky a pripadne to fixuje
+        hlavna pamat 4BSD
+            -kernel
+            -core map (ani on ani kernel nikdy niesu odstrankovane)
+            -zvysna pamat (deli sa na ramce)
+        core map obsahuje info o obsahu ramcov (pre kazdy ramec jednu polozku) - prve dve polozky sa pouzivaju
+            ak je ramec volny - smerniky do zoznamu volnych ramcov , dalsie 3 na urcenie miesta na disku kde je
+            stranka ulozena, dalsie 3 davaju cislo v tabulke procesov pre proces, ktoremu stranka platri,posledna
+            polozka obsahuje flagy , potrebne pre strankovaci algoritmus
+        page fault - os berie prvu stranku zo zoznamu volnych , ak nieje ziadna volna proces je pozastaveny
+            kym daemon neuvolnu ramec
+        Nahradzovaci algoritmus
+            vykonavany page daemonom, ten sa budi kazdych 250 ms aby zistil pocet volnych ramcov (>=lotsfree,
+            sys parameter zvycajne aspon 1/4 pamate) - ak je mensi zacne presuvat stranky na disk , inak zaspi
+            two-handed clock algorithm - predna nuluje usage bit , zadna preveruje jeho nastavenie, (povodny 
+            hodinovy - prechody trvali pridlho) - stranky ktore su pri prechode druhou rucickou s R=0 su po
+            zapisani na disk zaradene do zoznamu volnych - kym daemon bezi , rucicky rotuju kym nevznikne
+            aspon lotsfree volnych poloziek, ak sa casto strankuje a pocet volnych ramcov je stale nizsi ako 
+            losfree swapper odsunie nejake procesy na swap-disk
+        Swapovaci algoritmus pre 4BSD / pre System V - dorobit
+Sprava suborov
+    subory - data ulozene na disku, ich spravovanie ma na starosti os - konkretne file system
+    Pouzivatelske hladisko
+        detaili ako kde je info. ulozena a ako disky pracuju pre pouzivatela skryte - ten vidi napr. len meno
+        Typy suborov
+            Unix - obycajne (text/binary), adresare - potrebne na to aby sa suborom mohli dat symbolicke mena - 
+                zapisovat moze len system , citat aj pouzivatelia, specialne subory - na pristup k v/v - blokove/
+                znakove, kazde v/v zariadenie specialny subor, operacie s nim inicializuju prenos na dane zariad.
+                FIFO subory pre pipes - pseudosubory, mozu byt otvorene dvomi procesmi na vytvorenie komunikac.
+                kanalu medzi nimi
+            pripony - rozlisuju typ - v Unixe len nepisana dohoda , v ms-dos sa spusti len .com .exe .bat
+        Atributy suborov
+            datum  a cas vytovrenie , velkost , informacia o ochrane , vlastnik, cas posledneho pristupu/modif.
+        Nezavislost na zariadeni
+            pristup rovnaky , bez ohladu na tom ci na disku / diskete / tlaciarni / terminaly...
+        Struktura (organizacia suborov)
+            -nestrukturovana postupnost bytov - OS sa nestara, vyznam dany programami (Unix,Dos)
+            -postupnost zaznamov (records) pevnej dlzky - kazdy zaznam ma internu strukturu, read cita jeden
+                zaznam , write pise jeden zaznam
+            -strom zaznamov (nie nutne pevna dlzka) - utriedene podla kluca - os rozhoduje kam da novy z. - ISAM
+        Pristup k suboru
+            povodne len sekvencny (mag. pasky), teraz aj inak , napr. random access (v db. systemoch)
+            na specifikaciu kde sa zacne citat 2 metody
+                pomocou pozicie - zmena aktualnej pozicie , potom read / write od nej
+                pomocou cisla alebo kluca zaznamu
+        Operacie so subormi
+            rozne pre rozne operacne systemy, vseobecne: create,delete,openc,close,read,write,apped,seek,rename,
+                get/set attributes
+        Adresare
+            najma na udrziavanie prehladu o ulozeni suborov - v mnohych os su aj adresare subory
+            Hierarchiskce systemy adresarov
+                -jeden adr. pre vsetkych - jednourovnova
+                -po jednom adresari pre kazdeho - dvojurovnova
+                -stromova struktura
+                -orientovany acyklicky graf - jeden subor moze mat niekolko mien a pristupovych ciest (umoznuje
+                zidelanie suborov)
+            Mena ciest (path names)
+                absolutne - od korena / relativne - vzhladom na working directory
+            Operacie s adresarmi
+                create, delete , opendir, closedir, readdir, rename, link, unlink
+Sprava priestoru na disku
+    Volne bloky
+        os si musi udrziavat prehlad o volnych blokoch na disku
+        -spajany zoznam volnych blokov - nevyhoda - na vyhrad. n blokov n pristupov k disku
+        -index blocks - spajany zoznam diskovych blokov - kazdy blok tolko adries volnych blokov kolko sa don 
+            zmesti + adresu na dalsi takyto blok - nevyhody - zly prehlad o suvislych volnych oblastiach, problem
+            ako znacit co su este smerniky na volne bloky a ktore polozky v poslednom indexe su prazdne
+        -bitova mapa - disk s n blokmi - mapa s n bitmi - 1 obsadeny 0 volny- 20k disk - cca 3 bloky
+    Diskove kvoty
+        v multiuzivatelskom os - kvota pristoru disku a poctu suborov na uzivatela
+Implementacia systemu suborov
+    Suvisla alokacia
+        vyhody - lahka implementacia, cely subor moze byt z disku citany naraz v 1 operacii
+        nevyhody - treba vopred boznat max. velkost suboru, fragmentacia disku (kompaktacia zvycajne velmi draha)
+    Spajany zoznam blokov na disku
+        prve slovo v bloku je smernik na dalsi blok (v adresari ulozene cislo prveho bloku) - nahodny pristup (
+        pristup niekam doprostred) velmi pomaly, problem ked pocet dat v bloku nieje mocnina 2 (mnohe programy
+        citaju a zapisuju v blokoch vlekosti moc. 2)
+    Spajany zoznam s indexom (FAT)
+        obe nevyhody eliminovane - smernik ulozeny v specialnej tabulke v pamati, v adresari sa udrzuje len cislo
+        prveho bloku suboru - smernik do tabulky (v nej najdeme cislo dalsieho bloku suboru)
+        nevyhoda - ak je disk velky - tabulka bude velka (zabera vela pamati), ak nebude cela v pamati bude 
+            nahodny pristup opat pomaly (koli nacitaniu tabulky z disku)
+    i-node (index node - Unix)
+        problem smernikov vo FAT ze su rozhadzane (teda cela tabulka aj pre jeden subor), lepsie drzat pointre
+        pre jeden subor spolu, i-node obsahuje aj dalsie info o subore
+        10 blokov priamo , potom single indirect , double indirec , triple indirect
+        v najhorsom pripade 3 pristupy , i-node sa nacita pri otvoreni suboru a ostava v pamati do zatvorenia
+Implementacia adresarov
+    najjednoduchsie - jeden adresar- subor ma extent a block count (kolkaty / z kolkych blokov suboru)
+    DOS, System V - pevna dlzka nazvu , BSD premenliva dlzka, vzdy sa najde najskor root a potom sa hladaju 
+        podadresare ako zaznami (v subore) - v dose root pevny poced podadresarov
+Zdielane subory
+    link - jeden subor sucasne vo viacerych adresaroch (viacero mien) - v UNIXE - 
+        -priamy link (hardlink) - v adresari sa vytvori polozka pre link obsahujuca meno linku a cislo i-node
+            (odkazuje na rovnaky i-node ako povodny subor)
+        -symbolic link - link bude realizovany ako sspecialny subor (typu link), obsahujuci povodny nazov
+            zdielaneho suboru
+    pri hardlinkoch counter linkov - kym existuje hardlink tka samotny subor sa nemoze zmazat z disku
+    problem pri symlinkoch - rezia navyse (vela citani z disku)
+    dalsi problem - viac nazvov pre subor - programi najdu rovnaky subor viackrat
+Vykonnost file-systemu
+    snaha redukovat pocet pristupov na disk - block cache / buffer cache - suhrn blokov ktore logicky patria
+    na disk ale udrziavaju sa v pamati - ak je blok v cache tak cita odtial , ak nieje nacita sa najskor do 
+    cache a potom cita odtial - ak cache plna vymazat (podobne ako pri mazani strankovania - nahradz. alg.)
+    pouziva sa modifikovane LRU (LRU je mozne lebo pocet odkazov do cache je relativne maly) - berie do uvahy
+    pravdepodobnost ze bdue blok potrebny znovu - ci je blok dolezity pre konzistentnost systemu (ak by bol ,
+    nastal by pad a nezapisal sa (a bol zmeneny) tak mohlo by to vies k nekonzistentnosti) - tie co budu
+    coskoro potrebne idu do LRU nakoniec a tie co nie idu dopredu, dolezite pre konz. sa pisu hned po modifik.
+    aj tak je neziaduce aby boli v LRU fronte dlho - riesenia
+        Unix - sync kazdych 30 sekund zapise modif. bloky
+        MS-DOS zapise modif. blok na disk hned po zapisani do cache - write-through cache (viac v/v operacii)
+Sprava periferii
+    -sledovanie stavu vsetkych zariadeni - riadiaci blok jednotky (Unit control block)-realizuje v/v dispecer
+    -rozhodovanie o pridelovani perifernych zariadeni - realizuje v/v planovac
+    -pridelenie periferneho zariadenia procesu
+    -uvolnovanie pridelenych perifernych zariadeni
+Rozdelenie perifernych zariadeni
+    -v/v - vstupne a vystupne
+    -vonkajsia pamat - sekvencny pristup / priamy pristup - magn. bubny/disky
+podla prenesenej informacie na zaklade jedneho pristupu
+    -blokove - zapis/citanie po blokoch (disk), blokovo adresovatelne (disk), neadresovatelne (magn. pasky)
+    -znakove - prenos inf. na zaklade toku znakov (bez umoznenia blokovej struktury) - terminal, riadkove tlac.,
+        snimac a dierovac dier. pasky , mys.. nie su adresovatelne , neumoznuju seek
+    niekedy mozu podla prikazu pracovat v blokovom alebo znakovom rezime
+    napr. hodiny nepatria do ani jedneho (iba gen. prerusenia)
+podla techniky pridelovania
+    pevne pridelovane (dedicated) - pridelene ulohe po cely cas (napr. tlaciaren)
+    zdielane (shared) - pouz. viacerymi procesmi (vacsina pamati s priamim pristupom) - treba urcit riadenie
+    virtualne (virtual) - napr. tlaciaren pomocou spooling na zdielane perif. zariadenia
+Technicke charakteristiky perifernych zariadeni
+    mechanicka/elektronicka cast
+        elekt - radic , mech - zariadenie
+    OS ma skoro vzdy do cinenia s radicom, nie zariadenim
+    uloha radica - premenit tok bitov na blok bajtov, oprava chyb ak treba
+    komunikacia s CPU pomocou registrov - sucast norm. adresneho priestoru (memory-mapped IO), alebo specialny
+        adr. priestor pre V/V , kazdy radic nejaku jeho cast
+    DMA - direct memory access (niektore radice)
+    bez DMA - nacita sa zo zariadenia do buffera radica (overi chyby, nacita cely blok), potom ukonci spojenie,
+        OS moze nacitat informaciu z buffer po bajtoch alebo slovach - v cykle , mina vela casu CPU
+    DMA - radic dostane adresu , nacita do buffra a bajt po bajte prepise do adresy (nemoze obist buffer - 
+        problem s rychlostami zbernic)
+    kedze kym radic prenesie data pod hlavu disku sa dostane dalsi sektor ( a do radica dalsie bity ) - riesenie
+        - radic cita kazdy druhy blok , citanie celej stopy dve otacky (alebo skipuje aj viac) - interleaving
+    v/v kanal - radic rozsireny na mikroprocesor so specializovanou mnoz instrukcii - vykonava bez zasahu cpu - 
+        cpu zada pracu a je prerusene az po jej dokonceni (btw prerusenia aj bez kanalu)
+    ak ma v/v kanal aj pamat - v/v procesor
+V/V software
+    vykonost a vseobecnost
+    osetrenie chyb - vo vseobecnosti radic , ak nevie tak osetrit driverom
+    struktura v/v softwareu do 4 vrstiev
+        interrupt handlers (sprac. preruseni)
+        device drivers (ovladace zariadeni)
+        device independent I/O software (V/V software nezavysli od zariadeni)
+        user level software (software na uzivatelskej urovni)
+    Interrupt handelrs
+        ked sa vyskytne prerusenie , prerus. procedura zabezpeci odblokovanie procesu ktory cakal na v/v
+    Device drivers
+        vsetok kod zavisli od zariadenia, riadi jeden typ / jednu triedu uzko suvisiacich zariadeni
+        ovladace prijimaju poziadavky od softwareu nezavisleho od zariadenia aprekladaju ho zariadeniu -rozhodnut
+        ktore operacie radica sa vykonaju , kym sa vykonavaju moze sa prerusit, po vykonani skontrolovat ci
+        je vsetko ok
+    Device independent I/O software
+        poskytuje jednotny interface pre pouzivatelsky software - mapuje symbolicke mena zariadeni, ochrana pred
+        neopravnenym pristupom, jednotna velkost blokov pre vyssie vrstvy , pridelovanie pevne pridelitelnych
+        zariadeni , osetruje chyby ktore nevie osetrit driver, patri sem aj alg. na zistenie volnych blokov na
+        disku pre pridelenie suboru
+    User level software
+        kniznicne procedury , spooling system (tlac, presun po sieti)
+Disky
+    cas na citanie a zapis urceny tromi faktormi
+        seek time (cas presunu halvy na prislusny cylinder)
+        rotational delay (cas posunu sektoru pod hlavu)
+        transfer time (cas prenosu)
+    pre vacsinu diskov dominantny seek time
+    rad poziadaviek - ak FCFS hladanie je nahodne - dlhe casy, mozne strategie
+        SSTF (shortest seek time first) - najmensi presun ramena s hlavami (problem - rameno stravi vela casu
+            v strede disku kde su presuny male a malokedy sa dostane k poziadavkam na okrajoch)
+        SCAN (elevator) (prehladavanie) - pohyb hlavy najprv v jendom smere (vsetko co moze) potom v opacnom
+        C-SCAN (cyklicke prehladavanie) - len jednym smerom (od stredu), potom skoci na zaciatok
+        N-step SCAN - hlava sa hybe hore dolu ale obsluhuje len poziadavky zadane pred zacatim pohybu (zadane
+            pocas pohybu idealne vyriesi v pripade presunu spat)
+    folding - niekolko kopii kazdej vety , vzdy sa najde najblizsia
+Hodiny
+    HW len generuje v danych intervaloch prerusenia
+    Software
+        Driver ma tieto funkcie
+            udrzovat cas - pri kazdom tiku sa zvacsi pocitadlo, pocet tikov od 12 am 1.1.1970, 3 pristupy
+                64 bitove pocitadlo - narocne pripocitavanie
+                tik je kazdu sekundu - 32 bitov 136 rokov
+                tiky relativne od casu botovania - pocitadlo bude mat 32 bitov
+            zabranuje procesu dlho bezat - ked zacne bezat init. pocitadla na kvantum od ktoreho sa odobera
+            administrativa CPU - treba procesom sledovat cas pouzitia cpi
+                -pocitadlom sekund - pri preruseni niekde odlozene a opat nahrate
+                -udrziavanim smernika do tabulky procesov a zvysovanim priamo pocitadla v polozke proces
+            osetrovanie systemoveho volania alarm vyvolavaneho pozivatelskymi procesmi
+            poskytovanie timerov pre casti systemu (watchdog timer) - napr. ak sa 3 sekundy nic nedeje s floppy
+                diskom vypne sa motor
+            monitorovanie a statistiky

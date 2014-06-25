@@ -1,5 +1,65 @@
-#svg{
-	position: fixed;
-	top:10px;
-	left: 350px;
+#top {
+	margin: 20px 20px 0px 20px;
+	padding: 10px;
+	border: 5px solid #ccc;
+	background: #666;
+	height: 100px; /* ie5win fudge begins */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	height: 70px;
+	}
+html>body #top {
+	height: 70px; /* ie5win fudge ends */
+	}
+#left {
+	position: absolute;
+	top: 120px;
+	left: 0px;
+	margin: 20px;
+	padding: 10px;
+	border: 5px solid #ccc;
+	background: #666;
+	width: 250px; /* ie5win fudge begins */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width: 250px;
+	}
+html>body #left {
+	width: 230px; /* ie5win fudge ends */
+	}
+#svgdiv {
+	margin: 20px 190px 20px 290px;
+	padding: 10px;
+	border: 5px solid #ccc;
+	background: #666;
+}
+h1{
+	color:white;
+	font-family: sans-serif;
+	font-variant: small-caps;
+}
+#right {
+	position: absolute;
+	top: 120px;
+	right: 0px; /* Opera5.02 will show a space 
+	at right when there is no scroll bar */
+	margin: 20px;
+	padding: 10px;
+	border: 5px solid #ccc;
+	background: #666;
+	width: 150px; /* ie5win fudge begins */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width: 120px;
+	}
+html>body right {
+	width: 120px; /* ie5win fudge ends */
+	}
+#background{
+	fill:#666;
+	stroke-width:3;
+	stroke:white;
+}
+#body{
+	color:white;
 }
