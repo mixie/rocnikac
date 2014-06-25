@@ -1,7 +1,7 @@
 function animation(haveLabels,dataHandler,nextButton) {	
 	this.haveLabels=haveLabels;
 	this.label=null;
-	this.x=100;this.y=200,this.color='#f06',this.size=1;
+	this.x=100;this.y=200;this.color='#f06';this.size=2;
 	if(haveLabels==true){
 		label=glob.svg.text("").move(x,y).fill(color).scale(size,size); //glob.svg.text("").move(x,y).fill(color).scale(size,size);
 	}
@@ -78,7 +78,11 @@ animation.prototype.showAndGetLabel=function(value,x,y,color,size){
 			this.label=glob.svg.text("asddsadsadas").move(this.x,this.y).fill(this.color).scale(this.size,this.size);
 			return this.label;
 		}else{
-			this.label.text(this.dataHandler.toText(value)).move(this.x,this.y).fill(this.color).scale(this.size,this.size);
+			this.label.text(this.dataHandler.toText(value))
+			.move(this.x,this.y)
+			.fill(this.color)
+			.scale(this.size,this.size)
+			.attr("font-weight","bold");
 			return;
 		}
 }

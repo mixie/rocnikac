@@ -63,7 +63,7 @@ temperatureanimation.prototype.newDS=function(value) {
 //	console.log(this.sets);
 	var tr=true;
 	var temp=this;
-	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.DSlabels.x, this.rect.dist*this.DSlabels.counter);
+	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.DSlabels.x, this.rect.dist*this.vybraneConvert[value.numDS]);
 	this.playStopPause(DSlabel);
 	this.DSlabels.counter++;
 	this.addToSet(value.numDS,DSlabel);
@@ -89,7 +89,7 @@ temperatureanimation.prototype.resizeDS=function(value){
 	if(diff>0){
 		for(var j=value.valDS-diff;j<value.valDS;j++){
 			var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
-			.move(this.rect.dist+this.rect.sizex*j,this.rect.dist*value.numDS)
+			.move(this.rect.dist+this.rect.sizex*j,this.rect.dist*this.vybraneConvert[value.numDS])
 			.radius(3)
 			.fill(this.rect.color_fade);
 			this.addToSet(value.numDS, rect);
@@ -116,7 +116,7 @@ temperatureanimation.prototype.accessToRect=function (value,ds,pos) {
 //	console.log(ds+' '+pos);
 	pos++;
 //	console.log(this.sets[ds].get(pos));
-	var rect=this.sets[ds].get(pos);
+	var rect=this.sets[ds].get(pos+1);
 	this.playStopPause(rect);
 	rect.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
 	.fill(temp.rect.color)
@@ -132,7 +132,7 @@ temperatureanimation.prototype.push_backDS=function  (value) {
 	var tr=true;
 	var temp=this;
 	var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
-			.move(this.rect.dist+this.rect.sizex*this.setsLen[value.numDS],this.rect.dist*value.numDS)
+			.move(this.rect.dist+this.rect.sizex*this.setsLen[value.numDS],this.rect.dist*this.vybraneConvert[value.numDS])
 			.radius(3)
 			.fill(this.rect.color_fade);
 	this.addToSet(value.numDS, rect);
