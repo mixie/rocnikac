@@ -1,15 +1,15 @@
-temperatureanimation.prototype = Object.create(animation.prototype);
+circleanimation.prototype = Object.create(temperatureanimation.prototype);
 
-temperatureanimation.prototype.constructor=animation;
+circleanimation.prototype.constructor=circleanimation;
 
-function temperatureanimation(haveLabels,dataHandler,nextButton,length,delay) {	
+function circleanimation(haveLabels,dataHandler,nextButton,length,delay) {
 	this.haveLabels=haveLabels;
 	this.dataHandler=dataHandler;
 	this.nextButton=nextButton;
 	var temp=this;
 	this.label=null;
-	this.x=100;
-	this.y=20;
+	this.x=glob.x/2;
+	this.y=10;
 	this.color='#f06';
 	this.size=1;
 	this.vybraneConvert=[];
@@ -30,47 +30,44 @@ function temperatureanimation(haveLabels,dataHandler,nextButton,length,delay) {
  		this.setsLen[this.dataHandler.selected[i]]=0;
  	}
  	console.log(this.sets[0]);
-	this.DSlabels={
-		x:10,y:100,color:'#f08',size:1,counter:0
-	}
 	this.animConstants={
 		type:'='
 	}
 	this.animConstants.length=length;
 	this.animConstants.delay=delay;
-	this.rect={
-		outX:500,
-		sizex:15,
-		sizey:15,
-		color:"#f08",
-		color_fade:"#666",
-		distx:100,
-		disty:50,
-		margin:50
+	this.animConstants.color_fade="#666";
+	this.circlePos=[];
+	this.labelPos=[];
+	this.circleRadius=6;
+	var len=this.dataHandler.selected.length;
+	var sqrt=Math.sqrt(len);
+	sqrt++;
+	sqrt=Math.round(sqrt);
+	var stepx=glob.x/sqrt;
+	var stepy=(glob.y-this.y*3)/sqrt;
+	console.log(len+" "+sqrt+" "+stepx+" "+stepy);
+	console.log(this.dataHandler.selected);
+	var k=0;
+	for (var i = 0; i < sqrt; i++) {
+		for(var j=0;j<sqrt;j++){
+			var cp={};
+			cp.x=j*stepx+stepx/2;
+			cp.y=i*stepy+stepy/2+this.y*3;
+			this.circlePos[k]=cp;
+			var lp={};
+			lp.x=j*stepx+stepy/2;
+			lp.y=i*stepy+this.y*3;
+			this.labelPos[k]=lp;
+			k++;
+		}
 	}
 }
 
-temperatureanimation.prototype.setLen=function(set){
-	console.log(set);
-	console.log(set.get(0));
-	return set.index(set.last())+1; //BUG
-}
-
-temperatureanimation.prototype.addToSet=function  (setIndex,content) {
-	this.sets[setIndex].add(content);
-	this.setsLen[setIndex]+=1;
-	console.log(this.sets[setIndex].get(this.setsLen[setIndex]-1));
-	console.log("aaa");
-	return;
-}
-
-temperatureanimation.prototype.newDS=function(value) {
-//	console.log(this.sets);
+circleanimation.prototype.newDS=function(value) {
 	var tr=true;
 	var temp=this;
-	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.DSlabels.x, this.rect.margin+this.rect.disty*this.vybraneConvert[value.numDS]).fill("white");
+	var DSlabel=glob.svg.text(this.dataHandler.DStoText(value)).move(this.labelPos[this.vybraneConvert[value.numDS]].x, this.labelPos[this.vybraneConvert[value.numDS]].y).fill("white");
 	this.playStopPause(DSlabel);
-	this.DSlabels.counter++;
 	this.nameSet.add(DSlabel);
 	DSlabel.animate(this.animConstants.length,this.animConstants.type,this.animConstants.delay)
 	.during(function() {
@@ -83,37 +80,51 @@ temperatureanimation.prototype.newDS=function(value) {
 	});
 }
 
-temperatureanimation.prototype.removeFromSet=function(setIndex,content){
-		this.sets[setIndex].remove(content);
-		this.rectSet.remove(content);
-		this.setsLen[setIndex]--;
-}
 
-temperatureanimation.prototype.resizeDS=function(value){
+circleanimation.prototype.randomColor = function() {
+	var col={};
+	col.r=Math.round(Math.random()*256);
+	col.g=Math.round(Math.random()*256);
+	col.b=Math.round(Math.random()*256);
+	var c=new SVG.Color(col);
+	console.log(c.toRgb());
+	return c.toHex();
+};
+
+circleanimation.prototype.resizeDS=function(value){
 	var tr=true;
 	var temp=this;
 	var diff=value.valDS-this.setsLen[value.numDS];
 	var newSet=glob.svg.set();
 	this.playStopPause(newSet);
-//	console.log(value.numDS);
+	var during=true;
+	var after=true;
 	if(diff>0){
 		for(var j=value.valDS-diff;j<value.valDS;j++){
-			console.log(j+" "+diff);
-			var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
-			.move(this.rect.distx+this.rect.sizex*j,this.rect.margin+this.rect.disty*this.vybraneConvert[value.numDS])
-			.radius(3)
-			.fill(this.rect.color_fade);
-			this.addToSet(value.numDS, rect);
-			newSet.add(rect);
-			this.rectSet.add(rect);
+			var circle=glob.svg.circle(this.circleRadius*(j+1))
+			.center(this.circlePos[this.vybraneConvert[value.numDS]].x,this.circlePos[this.vybraneConvert[value.numDS]].y)
+			.fill(this.animConstants.color_fade)
+			.back();
+			this.addToSet(value.numDS, circle);
+			newSet.add(circle);
+			this.rectSet.add(circle);
 		}
+		console.log(newSet);
 		this.playStopPause(newSet);
-		newSet.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
-		.fill(this.rect.color)
-		.during(function () {
-			temp.globalDuringActions(value);
-		}).after(function () {
-			temp.globalAfterActions(value);
+		newSet.each(function () {
+			this.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
+			.fill(temp.randomColor())
+			.during(function () {
+				if(during){
+					during=false;
+					temp.globalDuringActions(value);
+				}
+			}).after(function () {
+				if(after){
+					after=false;
+					temp.globalAfterActions(value);
+				}
+			});
 		});
 	}else if(diff<0){
 		console.log("AAAAAAAA");
@@ -140,15 +151,33 @@ temperatureanimation.prototype.resizeDS=function(value){
 	}
 }
 
+circleanimation.prototype.reverseColor = function(col) {
+	console.log("reverse");
+	var c=new SVG.Color(col);
+	var color=c.toRgb();
+	var rgb = color.substring(4, color.length-1)
+         .replace(/ /g, '')
+         .split(',');
+    rgb[0]=255-rgb[0];
+    rgb[1]=255-rgb[1];
+    rgb[2]=255-rgb[2];
+    var rgbstring="rgb("+rgb[0]+","+rgb[1]+","+rgb[2]+")";
+   	col=new SVG.Color(rgbstring);
+   	return col.toHex();
+};
 
-
-temperatureanimation.prototype.accessToRect=function (value,ds,pos) {
+circleanimation.prototype.accessToRect=function (value,ds,pos) {
+	console.log("aaaa");
 	var temp=this;
 	var rect=this.sets[ds].get(pos);
 	this.playStopPause(rect);
 	console.log(this.sets[0]+rect);
+	var col=rect.attr("fill");
+	var revCol=this.reverseColor(col);
+	console.log(col+revCol);
+	rect.fill(revCol);
 	rect.animate(temp.animConstants.length,temp.animConstants.type,temp.animConstants.delay)
-	.fill(temp.rect.color)
+	.fill(col)
 	.during(function () {
 		temp.globalDuringActions(value);
 	}).after(function  () {
@@ -157,13 +186,13 @@ temperatureanimation.prototype.accessToRect=function (value,ds,pos) {
 }
 
 
-temperatureanimation.prototype.push_backDS=function(value) {
+circleanimation.prototype.push_backDS=function(value) {
 	var tr=true;
 	var temp=this;
-	var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
+/**	var rect=glob.svg.rect(this.rect.sizex,this.rect.sizey)
 			.move(this.rect.distx+this.rect.sizex*this.setsLen[value.numDS],this.rect.margin+this.rect.disty*this.vybraneConvert[value.numDS])
 			.radius(3)
-			.fill(this.rect.color_fade);
+			.fill(this.rect.color_fade);**/
 	this.addToSet(value.numDS, rect);
 	this.rectSet.add(rect);
 	this.playStopPause(rect);
@@ -176,55 +205,55 @@ temperatureanimation.prototype.push_backDS=function(value) {
 		});
 }
 
-temperatureanimation.prototype.vectorNew=function (value) {
+circleanimation.prototype.vectorNew=function (value) {
 	this.newDS(value);
 }
 
-temperatureanimation.prototype.vectorResize=function (value) {
+circleanimation.prototype.vectorResize=function (value) {
 	this.resizeDS(value);
 }
 
-temperatureanimation.prototype.vectorOperator=function (value) {
+circleanimation.prototype.vectorOperator=function (value) {
 	this.operatorDS(value);
 }
 
-temperatureanimation.prototype.operatorDS=function (value) {
+circleanimation.prototype.operatorDS=function (value) {
 	this.accessToRect(value, value.numDS, value.valDS);
 }
 
-temperatureanimation.prototype.vectorPush_back=function (value) {
+circleanimation.prototype.vectorPush_back=function (value) {
 	this.push_backDS(value);
 }
 
-temperatureanimation.prototype.dequeNew=function (value) {
+circleanimation.prototype.dequeNew=function (value) {
 	this.newDS(value);
 }
 
-temperatureanimation.prototype.dequeResize=function (value) {
+circleanimation.prototype.dequeResize=function (value) {
 	this.resizeDS(value);
 }
 
-temperatureanimation.prototype.dequeOperator=function (value) {
+circleanimation.prototype.dequeOperator=function (value) {
 	this.operatorDS(value);
 }
 
-temperatureanimation.prototype.dequePush_back=function (value) {
+circleanimation.prototype.dequePush_back=function (value) {
 	this.push_backDS(value);	
 }
 
-temperatureanimation.prototype.dequePush_front=function (value) {
+circleanimation.prototype.dequePush_front=function (value) {
 	this.zobraz_label(value);
 }
 
-temperatureanimation.prototype.dequeFront=function (value) {
+circleanimation.prototype.dequeFront=function (value) {
 	this.accessToRect(value, value.numDS, 0);
 }
 
-temperatureanimation.prototype.dequeBack=function (value) {
+circleanimation.prototype.dequeBack=function (value) {
 	this.accessToRect(value, value.numDS, this.setsLen[value.numDS]-1);
 }
 
-temperatureanimation.prototype.deleteContent=function (value,place,move) {
+circleanimation.prototype.deleteContent=function (value,place,move) {
 	var temp=this;
 	var temprect=this.sets[value.numDS].get(place);
 	this.removeFromSet(value.numDS, temprect);
@@ -248,24 +277,24 @@ temperatureanimation.prototype.deleteContent=function (value,place,move) {
 		});
 }
 
-temperatureanimation.prototype.dequePop_back=function (value) {	
+circleanimation.prototype.dequePop_back=function (value) {	
 	this.deleteContent(value, this.setsLen[value.numDS]-1,false);
 }
 
-temperatureanimation.prototype.dequePop_front=function (value) {
+circleanimation.prototype.dequePop_front=function (value) {
 	this.deleteContent(value, 0,true);
 }
 
-temperatureanimation.prototype.setNew=function (value) {
+circleanimation.prototype.setNew=function (value) {
 	this.newDS(value);
 }
 
-temperatureanimation.prototype.setInsert=function (value) {
+circleanimation.prototype.setInsert=function (value) {
 	this.push_backDS(value);
 }
 
 
-temperatureanimation.prototype.changeColor=function(fill,changeR,changeG,changeB){
+circleanimation.prototype.changeColor=function(fill,changeR,changeG,changeB){
 	var col=new SVG.Color(fill);
 	var color=col.toRgb();
 	var rgb = color.substring(4, color.length-1)
@@ -281,7 +310,7 @@ temperatureanimation.prototype.changeColor=function(fill,changeR,changeG,changeB
 
 
 
-temperatureanimation.prototype.globalAfterActions=function(value){
+circleanimation.prototype.globalAfterActions=function(value){
 	var temp=this;
 	var first=true;
 	this.sets[value.numDS].animate(100,"=",100).after(function () {

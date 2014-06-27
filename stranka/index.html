@@ -8,6 +8,7 @@
         <script type="text/javascript" src="glob.js"></script>
         <script type="text/javascript" src="animation.js"></script>
         <script type="text/javascript" src="temperatureanimation.js"></script>
+        <script type="text/javascript" src="circleanim.js"></script>
         <script type="text/javascript" src="data.js"></script>
         <script type="text/javascript" src="draw.js"></script>
         <script type="text/javascript" src="main.js"></script>
@@ -24,10 +25,10 @@
     </div>
     <div id="svgdiv"></div>
     <div id="right">
-    <label>Animation type:</label><br/>
-    <input type="radio" name="anim" id="temperature" checked>
+    <label id="anim">Animation type:</label><br/>
+    <input type="radio" name="anim" id="temperature">
     <label for="temperature">temperature</label><br/>
-    <input type="radio" name="anim" id="circles">
+    <input type="radio" name="anim" id="circles" checked>
     <label for="circles">circles</label><br/>
     <input type="radio" name="anim" id="quantity">
     <label for="quantity">quantity</label><br/>
@@ -37,7 +38,7 @@
     <input type="number" id="delay" value="500"><br/>
     <input type="checkbox" id="next">
     <label for="next">use next</label><br/>
-    <input type="checkbox" id="labels">
+    <input type="checkbox" id="labels" checked>
     <label for="labels">display labels</label><br/>
     <button type="button" id="start">START</button><br/>
         <button type="button" id="pause">pause</button><br/>

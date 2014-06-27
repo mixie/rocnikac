@@ -21,7 +21,7 @@ function zobrazform(ds,val){
 	//$('#form').append("<input type='submit' name='sub2' id='sub2' value='choose'>");
 		$('#start').click(function(e) {
 			var vybrane=[];
-			$("input[type='checkbox']:checked").each(function(){
+			$("input[name='dschbox']:checked").each(function(){
 				vybrane.push($(this).attr("id"));
 			});
 			var dh=new dataHandler(vybrane, ds);
@@ -41,6 +41,9 @@ function zobrazform(ds,val){
 			}
 			if(a=="temperature"){
 					var anim=new temperatureanimation(labels,dh,next,length,delay);
+			}
+			if(a=="circles"){
+					var anim=new circleanimation(labels,dh,next,length,delay);
 			}
 			$("#next").click(function (e) {
 				if(next){

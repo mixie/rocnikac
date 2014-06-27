@@ -5,7 +5,7 @@ $(document).ready(function(){
 	var FUN_DS="funDS";
 	var VAL_DS="valDS";
 	var fileInput = document.getElementById('fileInput');
-	var svg = SVG('svgdiv').size(700,600);
+	var svg = SVG('svgdiv').size(glob.x,glob.y);
 	glob.svg=svg;
 	//svg.rect(700,600).attr("id","background");
 	$('#submit').click(function(e) {
